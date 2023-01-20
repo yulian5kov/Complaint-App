@@ -6,4 +6,6 @@
     <string name="login_password_hint">Password</string>
     <string name="login">LOGIN</string>
     <string name="new_user_register_now">New User? Register Now</string>
+    <string name="confirm_password_hint">Confirm Password</string>
+    <string name="register">Register</string>
 </resources>
