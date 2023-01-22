@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "923720358286",
+    "project_id": "ok-app-complaints",
+    "storage_bucket": "ok-app-complaints.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:923720358286:android:e72f7e42066c16d4fbacdf",
+        "android_client_info": {
+          "package_name": "com.example.app_comp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "923720358286-tjhkhsggllqoateoqlhuagrac16p7fnj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdBSb-YCHp9hiR4EyY6IK9T-NgNktkrF8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "923720358286-tjhkhsggllqoateoqlhuagrac16p7fnj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
