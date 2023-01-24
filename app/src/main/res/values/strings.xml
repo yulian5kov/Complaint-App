@@ -9,4 +9,6 @@
     <string name="confirm_password_hint">Confirm Password</string>
     <string name="register">Register</string>
     <string name="complaints">Complaints</string>
+    <string name="user_add_failure">Error adding user</string>
+    <string name="user_login_failure">Error Logging in user</string>
 </resources>

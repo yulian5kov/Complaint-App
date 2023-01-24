@@ -18,33 +18,6 @@ class RegisterFragment : Fragment() {
 
     private lateinit var binding: FragmentRegisterBinding
     private val viewModel: LoginViewModel by activityViewModels()
-    val mAuth: FirebaseAuth get() = FirebaseAuth.getInstance()
-
-    //fun Context.getSharedPrefs(): SharedPreferences = getSharedPreferences("Prefs", Context.MODE_PRIVATE)
-    //MODE_PRIVATE = 0
-
-    private val prefs = context?.getSharedPreferences("Prefs", Context.MODE_PRIVATE)
-
-    var userId: String
-        get() = prefs?.getString("userId", "")!!
-        set(userId) = prefs?.edit()?.putString("userId", userId)?.apply()!!
-
-    var userRole: String
-        get() = prefs?.getString("User", "")!!
-        set(userRole) = prefs?.edit()?.putString("User", userRole)?.apply()!!
-
-    var userName: String
-        get() = prefs?.getString("userName", "")!!
-        set(userRole) = prefs?.edit()?.putString("userName", userRole)?.apply()!!
-
-    var userEmail: String
-        get() = prefs?.getString("userEmail", "")!!
-        set(userRole) = prefs?.edit()?.putString("userEmail", userRole)?.apply()!!
-
-    var isLoggedIn: Boolean
-        get() = prefs?.getBoolean("isLoggedIn", false)!!
-        set(isLoggedIn) = prefs?.edit()?.putBoolean("isLoggedIn", isLoggedIn)?.apply()!!
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,13 +26,22 @@ class RegisterFragment : Fragment() {
         binding = FragmentRegisterBinding.inflate(layoutInflater)
 
         binding.btLogin.setOnClickListener {
-            //requireActivity().hideKeyboard(binding.btLogin)
             if (validateInputData()){
                 setUpRegisterObservers()
             }
         }
 
         return binding.root
+    }
+
+    private fun setUpRegisterObservers() {
+        viewModel.addUser(
+            User(
+                name = binding.etName.text.toString(),
+                email = binding.etEmail.text.toString(),
+                user_role = USER_ROLE
+            ), binding.etPassword.text.toString()
+        )
     }
 
     private fun validateInputData(): Boolean {
@@ -98,23 +80,5 @@ class RegisterFragment : Fragment() {
         return true
     }
 
-    private fun setUpRegisterObservers() {
-        viewModel.addUser(
-            User(
-                name = binding.etName.text.toString(),
-                email = binding.etEmail.text.toString(),
-                user_role = "User"
-            ), binding.etPassword.text.toString()
-        ).observe(requireActivity()) { user ->
-            userId = mAuth.currentUser!!.uid
-            userName = user.name
-            userEmail = user.email
-            userRole = user.user_role
-            isLoggedIn = true
-
-            startActivity(Intent(requireContext(), UserActivity::class.java))
-            requireActivity().finish()
-        }
-    }
 
 }

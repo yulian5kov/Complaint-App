@@ -24,24 +24,6 @@ class LoginActivity : AppCompatActivity() {
         replaceFragment(LoginFragment())
     }
 
-    fun /*AppCompatActivity.*/replaceFragment(fragment: Fragment) {
-        val backStateName: String = fragment.javaClass.name
-        //val frameLayout: FrameLayout = findViewById(R.id.frame_layout)
-        val frameLayout: FrameLayout = binding.frameLayout
 
-        val popFragment: Boolean = supportFragmentManager.popBackStackImmediate(backStateName, 0)
-        if (!popFragment) {
-            val beginTrans = supportFragmentManager.beginTransaction()
-            beginTrans.setCustomAnimations(
-                /* enter = */ R.anim.slide_in,
-                /* exit = */ R.anim.fade_out,
-                /* popEnter = */ R.anim.fade_in,
-                /* popExit = */ R.anim.slide_out
-            )
-            beginTrans.replace(frameLayout.id, fragment)
-            beginTrans.addToBackStack(backStateName)
-            beginTrans.commit()
-        }
-    }
 
 }
