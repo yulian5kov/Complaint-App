@@ -10,8 +10,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.app_comp.databinding.FragmentRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 
 class RegisterFragment : Fragment() {
@@ -27,15 +30,14 @@ class RegisterFragment : Fragment() {
 
         binding.btLogin.setOnClickListener {
             if (validateInputData()){
-                setUpRegisterObservers()
+                val user = User(name = binding.etName.text.toString(),
+                    email = binding.etEmail.text.toString(),
+                    user_role = USER_ROLE)
+                viewModel.addUser(user, binding.etPassword.text.toString())
             }
         }
 
         return binding.root
-    }
-
-    private fun setUpRegisterObservers() {
-
     }
 
     private fun validateInputData(): Boolean {

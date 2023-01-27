@@ -8,18 +8,24 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModelProvider
 import com.example.app_comp.databinding.FragmentLoginBinding
 
 
 class LoginFragment : Fragment() {
 
     private lateinit var binding: FragmentLoginBinding
+    private lateinit var viewModel: LoginViewModel
+    private lateinit var repository: FirestoreRepository
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentLoginBinding.inflate(layoutInflater)
+
+        repository = FirestoreRepository()
+        viewModel = ViewModelProvider(this)[LoginViewModel::class.java]
 
         binding.btLogin.setOnClickListener {
 
