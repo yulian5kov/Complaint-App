@@ -35,19 +35,10 @@ class RegisterFragment : Fragment() {
     }
 
     private fun setUpRegisterObservers() {
-        viewModel.addUser(
-            User(
-                name = binding.etName.text.toString(),
-                email = binding.etEmail.text.toString(),
-                user_role = USER_ROLE
-            ), binding.etPassword.text.toString()
-        )
+
     }
 
     private fun validateInputData(): Boolean {
-
-        var email = binding.etEmail.text.toString()
-
         if (binding.etName.text.toString().isEmpty()) {
             binding.tiName.error = "Email Required"
             binding.etName.requestFocus()
@@ -56,7 +47,7 @@ class RegisterFragment : Fragment() {
             binding.tiEmail.error = "Email Required"
             binding.etEmail.requestFocus()
             return false
-        } else if (email.toString().isNotEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        } else if (!isValidEmail(binding.etEmail.text.toString())) {
             binding.tiEmail.error = "Please enter a valid email"
             binding.etEmail.requestFocus()
             return false
@@ -79,6 +70,5 @@ class RegisterFragment : Fragment() {
         }
         return true
     }
-
 
 }

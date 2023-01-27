@@ -3,6 +3,7 @@ package com.example.app_comp
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Patterns
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
@@ -10,21 +11,16 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-
-val Context.config: Config get() = Config.newInstance(applicationContext)
-
-val Fragment.config: Config get() = Config.newInstance(requireActivity().applicationContext)
 
 val mAuth: FirebaseAuth get() = FirebaseAuth.getInstance()
 
 val storage: FirebaseStorage get() = FirebaseStorage.getInstance()
 
 val db: FirebaseFirestore get() = FirebaseFirestore.getInstance()
-
-fun Context.getSharedPrefs(): SharedPreferences = getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
 
 fun AppCompatActivity.replaceFragment(fragment: Fragment) {
     val backStateName: String = fragment.javaClass.name
@@ -85,4 +81,25 @@ fun Context.hideKeyboard(view: View) {
     val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
     imm.hideSoftInputFromWindow(view.windowToken, 0)
 }
+
+fun Activity.showProgress(){
+    val lineProgressIndicator: LinearProgressIndicator = findViewById(R.id.line_progress_indicator)
+    lineProgressIndicator.visibility = View.VISIBLE
+}
+
+fun Activity.hideProgress(){
+    val lineProgressIndicator: LinearProgressIndicator = findViewById(R.id.line_progress_indicator)
+    lineProgressIndicator.visibility = View.GONE
+}
+
+fun Fragment.showProgress(){
+    requireActivity().showProgress()
+}
+
+fun Fragment.hideProgress(){
+    requireActivity().hideProgress()
+}
+
+fun isValidEmail(email: String): Boolean =
+    email.isNotEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()
 
