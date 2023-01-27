@@ -16,12 +16,24 @@ class LoginViewModel : ViewModel() {
     private val _addUserEvent = MutableLiveData<Event<Unit>>()
     val addUserEvent: LiveData<Event<Unit>> = _addUserEvent
     private val firestoreRepository = FirestoreRepository()
+    private val _loginEvent = MutableLiveData<Event<Unit>>()
+    val loginEvent: LiveData<Event<Unit>>
+        get() = _loginEvent
+
     fun addUser(user: User, password: String) {
         _addUserEvent.value = Event.Loading(true)
         viewModelScope.launch {
             firestoreRepository.addUser(user, password).collect { event ->
                 _addUserEvent.value = event
             }
+        }
+    }
+
+    fun loginUser(email: String, password: String) {
+        viewModelScope.launch {
+            _loginEvent.value = Event.Loading(true)
+            val event = firestoreRepository.loginUser(email, password).first()
+            _loginEvent.value = event
         }
     }
 
