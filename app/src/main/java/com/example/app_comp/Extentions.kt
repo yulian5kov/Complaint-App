@@ -2,7 +2,6 @@ package com.example.app_comp
 
 import android.app.Activity
 import android.content.Context
-import android.content.SharedPreferences
 import android.util.Patterns
 import android.view.View
 import android.view.inputmethod.InputMethodManager

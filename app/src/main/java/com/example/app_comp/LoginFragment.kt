@@ -3,13 +3,15 @@ package com.example.app_comp
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings.Global.putString
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
-import com.example.app_comp.databinding.FragmentLoginBinding
+import androidx.core.content.edit
 import androidx.lifecycle.Observer
+import com.example.app_comp.databinding.FragmentLoginBinding
 import androidx.lifecycle.ViewModelProvider
 
 
@@ -17,66 +19,65 @@ class LoginFragment : Fragment() {
 
     private lateinit var binding: FragmentLoginBinding
     private val viewModel = ViewModelProvider(requireActivity())[LoginViewModel::class.java]
-    val sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE)
-    private lateinit var repository: FirestoreRepository
+    private val sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE)
+    private val config = Config(requireContext())
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentLoginBinding.inflate(layoutInflater)
-        val isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false)
+        initListeners()
+        return binding.root
+    }
+
+    private fun initListeners() {
         binding.btLogin.setOnClickListener {
             if (validateInputData()) {
-                val isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false)
+                viewModel.loginEvent.observe(viewLifecycleOwner) { event ->
+                    when (event) {
+                        is Event.Loading -> showProgress()
+                        is Event.Success -> {
+                            hideProgress()
+                            val user = event.data as? User
+                            if (user != null) {
+                                config.isLoggedIn = true
+                                config.userId = user.id
+                                config.userRole = user.user_role
+                                config.userName = user.name
+                                config.userEmail = user.email
 
-                if (isLoggedIn) {
-                    val userRole = sharedPreferences.getString("userRole", "")
-                    if (userRole != null) {
-                        navigateToUserOrAdmin(userRole)
-                    }
-                } else {
-                    viewModel.loginEvent.observe(viewLifecycleOwner) { event ->
-                        when (event) {
-                            is Event.Loading -> showProgress()
-                            is Event.Success -> {
-                                hideProgress()
-                                val userRole = (event.data as? User)?.user_role
-                                if (userRole != null) {
-                                    navigateToUserOrAdmin(userRole)
+                                sharedPreferences.edit {
+                                    putBoolean("isLoggedIn", config.isLoggedIn)
+                                    putString("userId", config.userId)
+                                    putString("userRole", config.userRole)
+                                    putString("userName", config.userName)
+                                    putString("userEmail", config.userEmail)
                                 }
+                            } else {
+                                showToast("user is null")
                             }
-                            is Event.Error -> {
-                                hideProgress()
-                                showToast("event.error pri login")
-                            }
-                            is Event.Failed -> {
-                                hideProgress()
-                                showToast("event.failed pri login")
-                            }
+
+                        }
+                        is Event.Error -> {
+                            hideProgress()
+                            showToast("event.error pri login")
+                        }
+                        is Event.Failed -> {
+                            hideProgress()
+                            showToast("event.failed pri login")
                         }
                     }
-                    viewModel.loginUser(binding.etEmail.text.toString(), binding.etPassword.text.toString())
                 }
+                viewModel.loginUser(binding.etEmail.text.toString(), binding.etPassword.text.toString())
             }
         }
+
         binding.tvGoToRegister.setOnClickListener {
             requireActivity().replaceFragment(RegisterFragment())
         }
-
-        return binding.root
-
     }
 
-    private fun navigateToUserOrAdmin(userRole: String) {
-        sharedPreferences.edit().putBoolean("isLoggedIn", true).apply()
-        sharedPreferences.edit().putString("userRole", userRole).apply()
-        if (userRole == USER_ROLE) {
-            startActivity(Intent(requireActivity(), UserActivity::class.java))
-        } else if (userRole == ADMIN_ROLE) {
-            startActivity(Intent(requireActivity(), AdminActivity::class.java))
-        }
-    }
 
     private fun validateInputData(): Boolean {
         if (binding.etEmail.text.toString().isEmpty()) {
@@ -99,7 +100,7 @@ class LoginFragment : Fragment() {
         if(isAdded){
             super.onAttach(context)
         }else{
-
+            Log.i(DEBUGGING, "not attached")
         }
     }
 
