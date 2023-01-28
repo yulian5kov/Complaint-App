@@ -4,12 +4,13 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import com.example.app_comp.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-    private val config = Config(this)
+    private val Context.config: Config get() = Config.newInstance(applicationContext)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,7 +19,9 @@ class LoginActivity : AppCompatActivity() {
         init()
     }
     private fun init(){
+        Log.d(DEBUGGING, "swag" + config.isLoggedIn.toString())
         if (config.isLoggedIn) {
+            Log.d(DEBUGGING, "hui")
             if(config.userRole == USER_ROLE){
                 startActivity(Intent(this, UserActivity::class.java))
                 finish()
@@ -30,5 +33,10 @@ class LoginActivity : AppCompatActivity() {
         } else {
             replaceFragment(LoginFragment())
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        config.logout()
     }
 }

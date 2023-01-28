@@ -1,16 +1,13 @@
 package com.example.app_comp
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import android.provider.Settings.Global.putString
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.edit
-import androidx.lifecycle.Observer
 import com.example.app_comp.databinding.FragmentLoginBinding
 import androidx.lifecycle.ViewModelProvider
 
@@ -19,8 +16,8 @@ class LoginFragment : Fragment() {
 
     private lateinit var binding: FragmentLoginBinding
     private val viewModel = ViewModelProvider(requireActivity())[LoginViewModel::class.java]
-    private val sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE)
-    private val config = Config(requireContext())
+    val Fragment.config: Config get() = Config.newInstance(requireActivity().applicationContext)
+    private val config: Config = Config(requireContext())
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,7 +44,7 @@ class LoginFragment : Fragment() {
                                 config.userName = user.name
                                 config.userEmail = user.email
 
-                                sharedPreferences.edit {
+                                config.sharedPreferences?.edit {
                                     putBoolean("isLoggedIn", config.isLoggedIn)
                                     putString("userId", config.userId)
                                     putString("userRole", config.userRole)
