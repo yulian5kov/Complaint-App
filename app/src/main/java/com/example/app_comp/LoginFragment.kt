@@ -16,8 +16,6 @@ class LoginFragment : Fragment() {
 
     private lateinit var binding: FragmentLoginBinding
     private val viewModel = ViewModelProvider(requireActivity())[LoginViewModel::class.java]
-    val Fragment.config: Config get() = Config.newInstance(requireActivity().applicationContext)
-    private val config: Config = Config(requireContext())
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,7 +42,7 @@ class LoginFragment : Fragment() {
                                 config.userName = user.name
                                 config.userEmail = user.email
 
-                                config.sharedPreferences?.edit {
+                                config.prefs.edit {
                                     putBoolean("isLoggedIn", config.isLoggedIn)
                                     putString("userId", config.userId)
                                     putString("userRole", config.userRole)

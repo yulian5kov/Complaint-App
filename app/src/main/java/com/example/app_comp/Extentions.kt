@@ -2,6 +2,7 @@ package com.example.app_comp
 
 import android.app.Activity
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Patterns
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -101,4 +102,9 @@ fun Fragment.hideProgress(){
 
 fun isValidEmail(email: String): Boolean =
     email.isNotEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()
+
+val Context.config: Config get() = Config.newInstance(applicationContext)
+fun Context.getSharedPrefs(): SharedPreferences = getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
+
+val Fragment.config: Config get() = Config.newInstance(requireActivity().applicationContext)
 
