@@ -4,7 +4,6 @@ package com.example.app_comp
 const val PREFS_KEY = "Prefs"
 const val USER_NAME = "userName"
 const val USER_EMAIL = "userEmail"
-const val ID = "id"
 const val USER_ID = "userId"
 const val IS_LOGGED_IN = "isLoggedIn"
 
