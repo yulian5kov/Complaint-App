@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.edit
+import androidx.fragment.app.viewModels
 import com.example.app_comp.databinding.FragmentLoginBinding
 import androidx.lifecycle.ViewModelProvider
 
@@ -15,7 +16,9 @@ import androidx.lifecycle.ViewModelProvider
 class LoginFragment : Fragment() {
 
     private lateinit var binding: FragmentLoginBinding
-    private val viewModel = ViewModelProvider(requireActivity())[LoginViewModel::class.java]
+    //private val viewModel = ViewModelProvider(requireActivity())[LoginViewModel::class.java]
+    private val viewModel: LoginViewModel by viewModels()
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
