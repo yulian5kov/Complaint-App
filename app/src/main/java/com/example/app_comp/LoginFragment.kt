@@ -1,14 +1,15 @@
 package com.example.app_comp
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.edit
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.example.app_comp.databinding.FragmentLoginBinding
 
 
@@ -31,7 +32,42 @@ class LoginFragment : Fragment() {
     private fun initListeners() {
         binding.btLogin.setOnClickListener {
             if (validateInputData()) {
+                val email = binding.etEmail.text.toString()
+                val password = binding.etPassword.text.toString()
 
+                viewModel.loginUser(email, password)
+                    .observe(viewLifecycleOwner, Observer { result ->
+                    when (result) {
+                        is Result.Success -> {
+                            hideProgress()
+                            var user = result.data
+                            config.userId = mAuth.currentUser!!.uid
+                            config.userName = user.name
+                            config.userEmail = user.email
+                            config.userRole = user.user_role
+                            config.isLoggedIn = true
+                            if(user.user_role == USER_ROLE){
+                                startActivity(Intent(requireActivity(), UserActivity::class.java))
+                            } else {
+                                startActivity(Intent(requireActivity(), AdminActivity::class.java))
+                            }
+                        }
+                        is Result.Error -> {
+                            hideProgress()
+                            Log.d(DEBUGGING, "putka1 Error: ${result.exception}")
+                            showToast("putka1 Login failed: ${result.exception}")
+                        }
+                        is Result.Loading -> {
+                            showProgress()
+                            Log.d(DEBUGGING,"putka2")
+                        }
+                        is Result.Failed -> {
+                            hideProgress()
+                            Log.d(DEBUGGING,"putka3")
+
+                        }
+                    }
+                })
             }
         }
 
