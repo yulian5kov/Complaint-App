@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.callbackFlow
 
 class FirestoreRepository {
 
-    fun addUser(user: User, password: String): Flow<Event<Unit>> {
+    fun addUser(user: User, password: String): Flow<Result<User>> {
         return callbackFlow {
             mAuth
                 .createUserWithEmailAndPassword(user.email, password)
@@ -23,14 +23,14 @@ class FirestoreRepository {
                                 .addOnCompleteListener { task ->
                                     if (task.isSuccessful) {
                                         Log.i(DEBUGGING, "User added successfully")
-                                        trySend(Event.Success(Unit)).isSuccess
+                                        trySend(Result.Success(user)).isSuccess
                                     } else {
-                                        trySend(Event.Error(task.exception?.message.toString())).isSuccess
+                                        trySend(Result.Error(task.exception?.message.toString())).isSuccess
                                     }
                                 }
                         }
                     } else {
-                        trySend(Event.Error(task.exception?.message.toString())).isSuccess
+                        trySend(Result.Error(task.exception?.message.toString())).isSuccess
                     }
                 }
             awaitClose {
@@ -39,7 +39,7 @@ class FirestoreRepository {
         }
     }
 
-    fun loginUser(email: String, password: String): Flow<Event<Unit>> {
+    fun loginUser(email: String, password: String): Flow<Result<User>> {
         return callbackFlow {
             mAuth
                 .signInWithEmailAndPassword(email, password)
@@ -48,10 +48,10 @@ class FirestoreRepository {
                         Log.i(DEBUGGING, "signInWithEmail:success")
                         val firebaseUser = task.result?.user
                         firebaseUser?.let {
-                            trySend(Event.Success(Unit)).isSuccess
+                            trySend(Result.Success(User.fromFirebaseUser(firebaseUser)))
                         }
                     } else {
-                        trySend(Event.Error(task.exception?.message.toString())).isSuccess
+                        trySend(Result.Error(task.exception?.message.toString()))
                     }
                 }
             awaitClose {
@@ -59,4 +59,25 @@ class FirestoreRepository {
             }
         }
     }
+
+//    fun loginUser(email: String, password: String): Flow<Event<User>> {
+//        return callbackFlow {
+//            mAuth
+//                .signInWithEmailAndPassword(email, password)
+//                .addOnCompleteListener { task ->
+//                    if (task.isSuccessful) {
+//                        Log.i(DEBUGGING, "signInWithEmail:success")
+//                        val firebaseUser = task.result?.user
+//                        firebaseUser?.let {
+//                            trySend(Event.Success(User.fromFirebaseUser(firebaseUser))).isSuccess
+//                        }
+//                    } else {
+//                        trySend(Event.Error(task.exception?.message.toString())).isSuccess
+//                    }
+//                }
+//            awaitClose {
+//                Log.d(DEBUGGING, "Cancelling posts listener")
+//            }
+//        }
+//    }
 }

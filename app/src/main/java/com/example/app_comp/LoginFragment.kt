@@ -11,6 +11,8 @@ import androidx.core.content.edit
 import androidx.fragment.app.viewModels
 import com.example.app_comp.databinding.FragmentLoginBinding
 import androidx.lifecycle.ViewModelProvider
+import com.android.volley.NetworkError
+import java.io.IOException
 
 
 class LoginFragment : Fragment() {
@@ -34,10 +36,12 @@ class LoginFragment : Fragment() {
             if (validateInputData()) {
                 viewModel.loginEvent.observe(viewLifecycleOwner) { event ->
                     when (event) {
-                        is Event.Loading -> showProgress()
-                        is Event.Success -> {
+                        is Result.Loading -> showProgress()
+                        is Result.Success<User> -> {
                             hideProgress()
-                            val user = event.data as? User
+                            val user = event.data /*as? User*/
+
+
                             if (user != null) {
                                 config.isLoggedIn = true
                                 config.userId = user.id
@@ -57,11 +61,12 @@ class LoginFragment : Fragment() {
                             }
 
                         }
-                        is Event.Error -> {
+                        is Result.Error -> {
                             hideProgress()
+                            Log.e(DEBUGGING, "tyler Error: ${event.exception}")
                             showToast("event.error pri login")
                         }
-                        is Event.Failed -> {
+                        is Result.Failed -> {
                             hideProgress()
                             showToast("event.failed pri login")
                         }

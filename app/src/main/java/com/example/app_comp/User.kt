@@ -1,5 +1,6 @@
 package com.example.app_comp
 
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.PropertyName
 
@@ -12,5 +13,15 @@ data class User(
     @set:PropertyName("is_blocked")
     var is_blocked: Boolean = false,
     var user_role: String = ""
-)
+){
+    companion object {
+        fun fromFirebaseUser(firebaseUser: FirebaseUser): User {
+            return User().apply {
+                id = firebaseUser.uid
+                email = firebaseUser.email!!
+                // add more properties as necessary
+            }
+        }
+    }
+}
 
