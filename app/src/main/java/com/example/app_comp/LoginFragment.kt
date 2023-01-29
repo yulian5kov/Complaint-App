@@ -34,7 +34,8 @@ class LoginFragment : Fragment() {
     private fun initListeners() {
         binding.btLogin.setOnClickListener {
             if (validateInputData()) {
-                viewModel.loginEvent.observe(viewLifecycleOwner) { event ->
+                viewModel.loginUser(binding.etEmail.text.toString(), binding.etPassword.text.toString())
+                    .observe(viewLifecycleOwner) { event ->
                     when (event) {
                         is Result.Loading -> showProgress()
                         is Result.Success<User> -> {
