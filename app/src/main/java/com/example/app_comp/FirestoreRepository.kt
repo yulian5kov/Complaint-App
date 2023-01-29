@@ -60,24 +60,4 @@ class FirestoreRepository {
         }
     }
 
-//    fun loginUser(email: String, password: String): Flow<Event<User>> {
-//        return callbackFlow {
-//            mAuth
-//                .signInWithEmailAndPassword(email, password)
-//                .addOnCompleteListener { task ->
-//                    if (task.isSuccessful) {
-//                        Log.i(DEBUGGING, "signInWithEmail:success")
-//                        val firebaseUser = task.result?.user
-//                        firebaseUser?.let {
-//                            trySend(Event.Success(User.fromFirebaseUser(firebaseUser))).isSuccess
-//                        }
-//                    } else {
-//                        trySend(Event.Error(task.exception?.message.toString())).isSuccess
-//                    }
-//                }
-//            awaitClose {
-//                Log.d(DEBUGGING, "Cancelling posts listener")
-//            }
-//        }
-//    }
 }

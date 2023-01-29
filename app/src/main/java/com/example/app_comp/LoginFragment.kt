@@ -10,9 +10,6 @@ import android.view.ViewGroup
 import androidx.core.content.edit
 import androidx.fragment.app.viewModels
 import com.example.app_comp.databinding.FragmentLoginBinding
-import androidx.lifecycle.ViewModelProvider
-import com.android.volley.NetworkError
-import java.io.IOException
 
 
 class LoginFragment : Fragment() {
@@ -34,46 +31,7 @@ class LoginFragment : Fragment() {
     private fun initListeners() {
         binding.btLogin.setOnClickListener {
             if (validateInputData()) {
-                viewModel.loginUser(binding.etEmail.text.toString(), binding.etPassword.text.toString())
-                    .observe(viewLifecycleOwner) { event ->
-                    when (event) {
-                        is Result.Loading -> showProgress()
-                        is Result.Success<User> -> {
-                            hideProgress()
-                            val user = event.data /*as? User*/
 
-
-                            if (user != null) {
-                                config.isLoggedIn = true
-                                config.userId = user.id
-                                config.userRole = user.user_role
-                                config.userName = user.name
-                                config.userEmail = user.email
-
-                                config.prefs.edit {
-                                    putBoolean("isLoggedIn", config.isLoggedIn)
-                                    putString("userId", config.userId)
-                                    putString("userRole", config.userRole)
-                                    putString("userName", config.userName)
-                                    putString("userEmail", config.userEmail)
-                                }
-                            } else {
-                                showToast("user is null")
-                            }
-
-                        }
-                        is Result.Error -> {
-                            hideProgress()
-                            Log.e(DEBUGGING, "tyler Error: ${event.exception}")
-                            showToast("event.error pri login")
-                        }
-                        is Result.Failed -> {
-                            hideProgress()
-                            showToast("event.failed pri login")
-                        }
-                    }
-                }
-                viewModel.loginUser(binding.etEmail.text.toString(), binding.etPassword.text.toString())
             }
         }
 
