@@ -10,7 +10,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.example.app_comp.databinding.FragmentLoginBinding
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 
 
 class LoginFragment : Fragment() {
@@ -36,38 +40,35 @@ class LoginFragment : Fragment() {
                 val password = binding.etPassword.text.toString()
 
                 viewModel.loginUser(email, password)
-                    .observe(viewLifecycleOwner, Observer { result ->
-                    when (result) {
-                        is Result.Success -> {
-                            hideProgress()
-                            var user = result.data
-                            config.userId = mAuth.currentUser!!.uid
-                            config.userName = user.name
-                            config.userEmail = user.email
-                            config.userRole = user.user_role
-                            config.isLoggedIn = true
-                            if(user.user_role == USER_ROLE){
-                                startActivity(Intent(requireActivity(), UserActivity::class.java))
-                            } else {
-                                startActivity(Intent(requireActivity(), AdminActivity::class.java))
+                    .onStart {
+                        showProgress()
+                    }
+                    .onEach { result ->
+                        when (result) {
+                            is Result.Success<User> -> {
+                                hideProgress()
+                                val user = result.data
+                                config.userId = mAuth.currentUser!!.uid
+                                config.userName = user.name
+                                config.userEmail = user.email
+                                config.userRole = user.user_role
+                                config.isLoggedIn = true
+                                if(user.user_role == USER_ROLE){
+                                    startActivity(Intent(requireActivity(), UserActivity::class.java))
+                                } else {
+                                    startActivity(Intent(requireActivity(), AdminActivity::class.java))
+                                }
+                            }
+                            is Result.Error -> {
+                                hideProgress()
+                                showToast("Login failed: ${result.exception}")
+                            }
+                            else -> {
+                                hideProgress()
                             }
                         }
-                        is Result.Error -> {
-                            hideProgress()
-                            Log.d(DEBUGGING, "putka1 Error: ${result.exception}")
-                            showToast("putka1 Login failed: ${result.exception}")
-                        }
-                        is Result.Loading -> {
-                            showProgress()
-                            Log.d(DEBUGGING,"putka2")
-                        }
-                        is Result.Failed -> {
-                            hideProgress()
-                            Log.d(DEBUGGING,"putka3")
-
-                        }
                     }
-                })
+                    .launchIn(lifecycleScope)
             }
         }
 

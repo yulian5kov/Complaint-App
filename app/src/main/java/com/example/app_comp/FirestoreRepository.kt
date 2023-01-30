@@ -11,27 +11,19 @@ class FirestoreRepository {
         return callbackFlow {
             mAuth
                 .createUserWithEmailAndPassword(user.email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Log.i(DEBUGGING, "createUserWithEmail:success")
-                        val firebaseUser = task.result?.user
-                        firebaseUser?.let {
-                            db
-                                .collection("users")
-                                .document(it.uid)
-                                .set(user)
-                                .addOnCompleteListener { task ->
-                                    if (task.isSuccessful) {
-                                        Log.i(DEBUGGING, "User added successfully")
-                                        trySend(Result.Success(user)).isSuccess
-                                    } else {
-                                        trySend(Result.Error(task.exception?.message.toString())).isSuccess
-                                    }
-                                }
+                .addOnSuccessListener { it ->
+                    user.id = it.user?.uid!!
+                    db.collection("users").document(user.id)
+                        .set(user)
+                        .addOnSuccessListener {
+                            trySend(Result.Success(user)).isSuccess
                         }
-                    } else {
-                        trySend(Result.Error(task.exception?.message.toString())).isSuccess
-                    }
+                        .addOnFailureListener {
+                            trySend(Result.Error(it.message!!)).isSuccess
+                        }
+                }
+                .addOnFailureListener {
+                    trySend(Result.Error(it.message!!)).isSuccess
                 }
             awaitClose {
                 Log.d(DEBUGGING, "Cancelling posts listener")
@@ -41,21 +33,27 @@ class FirestoreRepository {
 
     fun loginUser(email: String, password: String): Flow<Result<User>> {
         return callbackFlow {
-            mAuth
-                .signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Log.i(DEBUGGING, "signInWithEmail:success")
-                        val firebaseUser = task.result?.user
-                        firebaseUser?.let {
-                            trySend(Result.Success(User.fromFirebaseUser(firebaseUser)))
+            mAuth.signInWithEmailAndPassword(email, password)
+                .addOnSuccessListener { it ->
+                    db.collection("users").document(it.user?.uid!!)
+                        .get()
+                        .addOnSuccessListener {
+                            if(it.exists()) {
+                                val user = it.toObject(User::class.java)
+                                trySend(Result.Success(user!!)).isSuccess
+                            }else{
+                                trySend(Result.Failed("User not found", "swag")).isSuccess
+                            }
                         }
-                    } else {
-                        trySend(Result.Error(task.exception?.message.toString()))
-                    }
+                        .addOnFailureListener {
+                            trySend(Result.Error(it.message!!)).isSuccess
+                        }
+            }
+                .addOnFailureListener {
+                    trySend(Result.Error(it.message!!)).isSuccess
                 }
             awaitClose {
-                Log.d(DEBUGGING, "Cancelling posts listener")
+                Log.d(DEBUGGING, "Cancelling login listener")
             }
         }
     }

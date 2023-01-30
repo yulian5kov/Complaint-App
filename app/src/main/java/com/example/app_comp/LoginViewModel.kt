@@ -1,15 +1,12 @@
 package com.example.app_comp
 
 import androidx.lifecycle.*
+import kotlinx.coroutines.flow.Flow
 
 class LoginViewModel : ViewModel() {
     private var repo = FirestoreRepository()
 
-    fun loginUser(email: String, password: String): LiveData<Result<User>> {
-        return repo.loginUser(email, password).asLiveData()
-    }
+    fun loginUser(email: String, password: String): Flow<Result<User>> = repo.loginUser(email, password)
 
-    fun addUser(user: User, password: String): LiveData<Result<User>> {
-        return repo.addUser(user, password).asLiveData()
-    }
+    fun addUser(user: User, password: String): Flow<Result<User>> = repo.addUser(user, password)
 }
