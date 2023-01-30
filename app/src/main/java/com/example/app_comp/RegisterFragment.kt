@@ -30,10 +30,49 @@ class RegisterFragment : Fragment() {
 
         binding.btLogin.setOnClickListener {
             if (validateInputData()){
-                val user = User(name = binding.etName.text.toString(),
-                    email = binding.etEmail.text.toString(),
-                    user_role = USER_ROLE)
-                viewModel.addUser(user, binding.etPassword.text.toString())
+                val name = binding.etName.text.toString()
+                val email = binding.etEmail.text.toString()
+                val password = binding.etPassword.text.toString()
+
+                if (email.isEmpty() || password.isEmpty() || name.isEmpty()) {
+                    showToast("Please fill in all the fields")
+                    return@setOnClickListener
+                }
+
+                val user = User(name = name, email = email, user_role = USER_ROLE)
+                showProgress()
+
+                viewModel.addUser(user, password)
+                    .onEach { result ->
+                        when (result) {
+                            is Result.Success -> {
+                                hideProgress()
+                                showToast("User successfully registered")
+
+                                config.userId = mAuth.currentUser!!.uid
+                                config.userName = user.name
+                                config.userEmail = user.email
+                                config.userRole = USER_ROLE
+                                config.isLoggedIn = true
+
+                                startActivity(Intent(requireActivity(), UserActivity::class.java))
+                                requireActivity().finish()
+                            }
+                            is Result.Error -> {
+                                hideProgress()
+                                showToast(result.exception)
+                            }
+                            is Result.Failed -> {
+                                hideProgress()
+                                showToast("${result.message} + ${result.error}")
+                            }
+                            is Result.Loading -> {
+                                showProgress()
+                            }
+                        }
+                    }
+                    .launchIn(viewLifecycleOwner.lifecycleScope)
+
             }
         }
 
