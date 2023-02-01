@@ -1,4 +1,4 @@
-package com.example.app_comp
+package com.example.app_comp.login
 
 import android.content.Context
 import android.content.Intent
@@ -9,8 +9,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import com.example.app_comp.*
 import com.example.app_comp.databinding.FragmentLoginBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

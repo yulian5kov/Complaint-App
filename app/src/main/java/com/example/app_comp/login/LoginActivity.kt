@@ -1,10 +1,10 @@
-package com.example.app_comp
+package com.example.app_comp.login
 
-import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import com.example.app_comp.*
 import com.example.app_comp.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {

@@ -1,6 +1,9 @@
-package com.example.app_comp
+package com.example.app_comp.login
 
 import androidx.lifecycle.*
+import com.example.app_comp.FirestoreRepository
+import com.example.app_comp.Result
+import com.example.app_comp.User
 import kotlinx.coroutines.flow.Flow
 
 class LoginViewModel : ViewModel() {

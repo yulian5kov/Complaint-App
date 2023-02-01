@@ -1,6 +1,7 @@
 package com.example.app_comp
 
 import android.util.Log
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -54,6 +55,40 @@ class FirestoreRepository {
                 }
             awaitClose {
                 Log.d(DEBUGGING, "Cancelling login listener")
+            }
+        }
+    }
+
+    fun postComplaint(complaint: String): Flow<Result<Unit>> {
+        return callbackFlow {
+            db.collection("complaints")
+                .add(complaint)
+                .addOnSuccessListener {
+                    trySend(Result.Success(Unit))
+                }
+                .addOnFailureListener {
+                    trySend(Result.Error(it.message!!))
+                }
+            awaitClose {
+                Log.d(DEBUGGING, "Cancelling post complaint listener")
+            }
+        }
+    }
+
+    fun getComplaints(userId: String): Flow<Result<List<Complaint>>> {
+        return callbackFlow {
+            db.collection("complaints")
+                .whereEqualTo("userId", userId)
+                .orderBy("date", Query.Direction.DESCENDING)
+                .addSnapshotListener { value, error ->
+                    if (error != null) {
+                        trySend(Result.Error(error.message!!))
+                    } else {
+                        trySend(Result.Success(value!!.toObjects(Complaint::class.java)))
+                    }
+                }
+            awaitClose {
+                Log.d(DEBUGGING, "Cancelling get complaints listener")
             }
         }
     }

@@ -1,18 +1,15 @@
-package com.example.app_comp
+package com.example.app_comp.login
 
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Patterns
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import com.example.app_comp.*
 import com.example.app_comp.databinding.FragmentRegisterBinding
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
