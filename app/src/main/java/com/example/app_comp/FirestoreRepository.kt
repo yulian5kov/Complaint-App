@@ -81,11 +81,23 @@ class FirestoreRepository {
                 .whereEqualTo("userId", userId)
                 .orderBy("date", Query.Direction.DESCENDING)
                 .addSnapshotListener { value, error ->
+                    //GlobalScope.launch {}
+
                     if (error != null) {
+                        //trySend(Result.Error(error.message!!))
+                        //launch { emit(Result.Error(error.message!!)) }
+                        //emit(Result.Error(error.message!!))
                         trySend(Result.Error(error.message!!))
+                            //.isSuccess
                     } else {
+                        //trySend(Result.Success(value!!.toObjects(Complaint::class.java)))
+                        //emit(Result.Success(value!!.toObjects(Complaint::class.java)))
+                        //launch { emit(Result.Success(value!!.toObjects(Complaint::class.java))) }
+                        //emit(Result.Success(value!!.toObjects(Complaint::class.java)))
                         trySend(Result.Success(value!!.toObjects(Complaint::class.java)))
+                            //.isSuccess
                     }
+
                 }
             awaitClose {
                 Log.d(DEBUGGING, "Cancelling get complaints listener")

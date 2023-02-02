@@ -10,6 +10,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.app_comp.databinding.FragmentViewComplaintsBinding
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class ViewComplaintsFragment : Fragment() {
 
@@ -34,13 +41,26 @@ class ViewComplaintsFragment : Fragment() {
             adapter = this@ViewComplaintsFragment.adapter
         }
 
-        viewModel.getComplaints(config.userId).observe(viewLifecycleOwner, Observer { result ->
-            when (result) {
-                is Result.Success<List<Complaint>> -> {
-                    adapter.complaints = result.data
-                    adapter.notifyDataSetChanged()
+        viewModel.getComplaints(config.userId)
+            .flowOn(Dispatchers.Main)
+            .onEach { result ->
+                when (result) {
+                    is Result.Success<List<Complaint>> -> {
+                        adapter.complaints = result.data
+                        adapter.notifyDataSetChanged()
+                    }
+                    is Result.Loading -> {
+                        // Show loading indicator
+                    }
+                    is Result.Failed -> {
+                        showToast("failed pri view complaints")
+                    }
+                    is Result.Error -> {
+                        showToast("error pri view complaints")
+                    }
                 }
             }
-        })
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
     }
 }
