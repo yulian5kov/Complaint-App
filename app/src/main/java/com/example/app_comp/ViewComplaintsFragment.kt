@@ -6,17 +6,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.app_comp.databinding.FragmentViewComplaintsBinding
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.app_comp.databinding.FragmentViewComplaintsBinding
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 
 class ViewComplaintsFragment : Fragment() {
 
@@ -24,11 +22,20 @@ class ViewComplaintsFragment : Fragment() {
     private val viewModel: UserViewModel by viewModels()
     private val adapter = ComplaintAdapter(emptyList())
 
+    class ComplaintDiffCallback : DiffUtil.ItemCallback<Complaint>() {
+        override fun areItemsTheSame(oldItem: Complaint, newItem: Complaint): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Complaint, newItem: Complaint): Boolean {
+            return oldItem == newItem
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        //binding = FragmentViewComplaintsBinding.inflate(layoutInflater)
         binding = FragmentViewComplaintsBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -46,8 +53,11 @@ class ViewComplaintsFragment : Fragment() {
             .onEach { result ->
                 when (result) {
                     is Result.Success<List<Complaint>> -> {
+                        val diffResult = DiffUtil.calculateDiff(ComplaintDiffCallback(adapter.complaints, result.data))
+                        //val diffResult = DiffUtil.calculateDiff(ComplaintDiffCallback(), adapter.complaints, result.data)
+                        //val diffResult = DiffUtil.calculateDiff(ComplaintDiffCallback(), result.data)
                         adapter.complaints = result.data
-                        adapter.notifyDataSetChanged()
+                        diffResult.dispatchUpdatesTo(adapter)
                     }
                     is Result.Loading -> {
                         // Show loading indicator
