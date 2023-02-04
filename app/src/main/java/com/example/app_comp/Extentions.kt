@@ -44,9 +44,9 @@ fun AppCompatActivity.replaceFragment(fragment: Fragment) {
 
 fun FragmentActivity.replaceFragment(fragment: Fragment) {
     val backStateName: String = fragment.javaClass.name
-    val  frameLayout: FrameLayout = findViewById(R.id.frame_layout)
-
+    //val  frameLayout: FrameLayout = findViewById(R.id.frame_layout)
     val popFragment: Boolean = supportFragmentManager.popBackStackImmediate(backStateName, 0)
+
     if (!popFragment) {
         val beginTrans = supportFragmentManager.beginTransaction()
         beginTrans.setCustomAnimations(
@@ -55,7 +55,7 @@ fun FragmentActivity.replaceFragment(fragment: Fragment) {
             /* popEnter = */ R.anim.fade_in,
             /* popExit = */ R.anim.slide_out
         )
-        beginTrans.replace(frameLayout.id, fragment)
+        beginTrans.replace(android.R.id.content, fragment)
         beginTrans.addToBackStack(backStateName)
         beginTrans.commit()
     }
