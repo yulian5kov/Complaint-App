@@ -2,6 +2,7 @@ package com.example.app_comp
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.app_comp.databinding.ActivityUserBinding
 import com.example.app_comp.login.LoginActivity
@@ -30,6 +31,7 @@ class UserActivity : AppCompatActivity() {
         }
 
         binding.btnAddComplaint.setOnClickListener {
+            binding.btnLogout.visibility = View.GONE
             replaceFragment(PostComplaintFragment())
         }
     }
