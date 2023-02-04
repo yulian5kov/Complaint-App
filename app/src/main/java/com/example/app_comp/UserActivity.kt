@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.app_comp.databinding.ActivityUserBinding
 import com.example.app_comp.login.LoginActivity
+import com.example.app_comp.login.LoginFragment
 
 
 class UserActivity : AppCompatActivity() {
@@ -26,6 +27,10 @@ class UserActivity : AppCompatActivity() {
             val intent = Intent(this@UserActivity, LoginActivity::class.java)
             startActivity(intent)
             finish()
+        }
+
+        binding.btnAddComplaint.setOnClickListener {
+            replaceFragment(PostComplaintFragment())
         }
     }
 
