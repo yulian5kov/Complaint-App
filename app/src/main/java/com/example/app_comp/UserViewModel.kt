@@ -7,4 +7,8 @@ class UserViewModel : ViewModel()  {
 
     private val repo: FirestoreRepository = FirestoreRepository()
 
+    fun postComplaint(complaint: Complaint) {
+        repo.postComplaint(complaint)
+    }
+
 }

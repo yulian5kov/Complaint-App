@@ -59,4 +59,14 @@ class FirestoreRepository {
         }
     }
 
+    fun postComplaint(complaint: Complaint) {
+        db.collection("complaints").add(complaint)
+            .addOnSuccessListener { documentReference ->
+                Log.d("FirestoreRepository", "Complaint posted with ID: ${documentReference.id}")
+            }
+            .addOnFailureListener { e ->
+                Log.w("FirestoreRepository", "Error posting complaint", e)
+            }
+    }
+
 }
