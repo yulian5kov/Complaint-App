@@ -1,9 +1,11 @@
 package com.example.app_comp
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.app_comp.databinding.FragmentPostComplaintBinding
@@ -30,5 +32,12 @@ class PostComplaintFragment : Fragment() {
             val complaint = Complaint(complaintText)
             viewModel.postComplaint(complaint)
         }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            val intent = Intent(requireContext(), UserActivity::class.java)
+            startActivity(intent)
+            requireActivity().finish()
+        }
+
     }
+
 }
