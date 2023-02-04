@@ -28,4 +28,8 @@ class UserActivity : AppCompatActivity() {
             finish()
         }
     }
+
+    override fun onBackPressed() {
+        finish()
+    }
 }
