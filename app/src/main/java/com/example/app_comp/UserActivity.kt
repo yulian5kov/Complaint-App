@@ -1,12 +1,11 @@
 package com.example.app_comp
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
-import androidx.navigation.ui.setupWithNavController
-import androidx.activity.viewModels
-import androidx.navigation.findNavController
+import androidx.appcompat.app.AppCompatActivity
 import com.example.app_comp.databinding.ActivityUserBinding
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.example.app_comp.login.LoginActivity
+
 
 class UserActivity : AppCompatActivity() {
 
@@ -17,7 +16,16 @@ class UserActivity : AppCompatActivity() {
         binding = ActivityUserBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navController = findNavController(R.id.nav_host_fragment)
-        binding.bottomNavigation.setupWithNavController(navController)
+        binding.btnLogout.setOnClickListener {
+            config.isLoggedIn = false
+            config.userId = ""
+            config.userName = ""
+            config.userEmail = ""
+            config.userRole = ""
+            //exit here
+            val intent = Intent(this@UserActivity, LoginActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 }
