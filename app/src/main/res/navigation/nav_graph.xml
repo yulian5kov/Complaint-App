@@ -24,6 +24,17 @@
         android:id="@+id/userActivity"
         android:name="com.example.app_comp.UserActivity"
         android:label="User Activity"
-        tools:layout="@layout/activity_user" />
+        tools:layout="@layout/activity_user">
+
+        <action
+            android:id="@+id/action_userActivity_to_postComplaintFragment"
+            app:destination="@id/postComplaintFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
+
+    </activity>
+
 
 </navigation>
