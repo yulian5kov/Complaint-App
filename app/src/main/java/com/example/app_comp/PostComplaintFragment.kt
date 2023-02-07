@@ -29,24 +29,6 @@ class PostComplaintFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val navController = findNavController()
-
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            when (destination.id) {
-                R.id.postComplaintFragment -> {
-                    requireActivity().onBackPressedDispatcher.addCallback(this) {
-                        navController.navigate(R.id.action_postComplaintFragment_to_userActivity)
-                    }
-                }
-                else -> {
-                    //requireActivity().onBackPressedDispatcher.removeCallback(this)
-                    if (this::backCallback.isInitialized) {
-                        backCallback.remove()
-                    }
-                }
-            }
-        }
-
         binding.btnAddImage.setOnClickListener {
             // Add image code here
         }
