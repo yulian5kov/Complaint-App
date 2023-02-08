@@ -22,7 +22,6 @@ class PostComplaintFragment : Fragment() {
     private val viewModel: UserViewModel by viewModels()
     private lateinit var backCallback: OnBackPressedCallback
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -46,58 +45,28 @@ class PostComplaintFragment : Fragment() {
 
         backCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                Log.d(DEBUGGING, "mazalqk")
                 requireActivity().onBackPressed()
             }
         }
-        //requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backCallback)
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            requireActivity().supportFragmentManager.popBackStack()
-        }
-
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backCallback)
     }
 
     override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
 
         if (item.itemId == android.R.id.home) {
             requireFragmentManager().popBackStack()
-            //activity?.onBackPressed()
             return true
         }
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        //(activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        requireActivity().onBackPressedDispatcher.addCallback(this) {
-            //requireActivity().onBackPressed()
-            activity?.onBackPressed()
-        }
+//    override fun onDestroyView() {
+//        super.onDestroyView()
+//        requireActivity().onBackPressedDispatcher.removeCallback(backCallback)
+//    }
+    fun onSupportNavigateUp(): Boolean {
+        requireActivity().onBackPressed()
+        return true
     }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        //backCallback.remove()
-        requireActivity().onBackPressedDispatcher.removeCallback(viewLifecycleOwner)
-    }
-
-    fun returnToUserActivity() {
-//        supportFragmentManager.findFragmentByTag(PostComplaintFragment.TAG)?.let { fragment ->
-//            supportFragmentManager.beginTransaction().remove(fragment).commit()
-//        }
-        fragmentManager?.let { fm ->
-            fm.findFragmentByTag(POST_COMPLAINT_FRAGMENT)?.let { fragment ->
-                fm.beginTransaction().remove(fragment).commit()
-            }
-        }
-        //finish()
-        activity?.finish()
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        requireActivity().onBackPressedDispatcher.removeCallback(backCallback)
-    }
-
 }
+
