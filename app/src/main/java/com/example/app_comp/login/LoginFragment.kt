@@ -36,47 +36,50 @@ class LoginFragment : Fragment() {
     private fun initListeners() {
         binding.btLogin.setOnClickListener {
             if (validateInputData()) {
-                val email = binding.etEmail.text.toString()
-                val password = binding.etPassword.text.toString()
-
-                viewModel.loginUser(email, password)
-                    .onStart {
-                        showProgress()
-                    }
-                    .onEach { result ->
-                        when (result) {
-                            is Result.Success<User> -> {
-                                hideProgress()
-                                val user = result.data
-                                config.userId = mAuth.currentUser!!.uid
-                                config.userName = user.name
-                                config.userEmail = user.email
-                                config.userRole = user.user_role
-                                config.isLoggedIn = true
-                                if(user.user_role == USER_ROLE){
-                                    startActivity(Intent(requireActivity(), UserActivity::class.java))
-                                } else {
-                                    startActivity(Intent(requireActivity(), AdminActivity::class.java))
-                                }
-                            }
-                            is Result.Error -> {
-                                hideProgress()
-                                showToast("Login failed: ${result.exception}")
-                            }
-                            else -> {
-                                hideProgress()
-                            }
-                        }
-                    }
-                    .launchIn(lifecycleScope)
+                setUpLoginObservers()
             }
         }
 
         binding.tvGoToRegister.setOnClickListener {
-            requireActivity().replaceFragment(RegisterFragment())
+            replaceFragment(RegisterFragment())
         }
     }
 
+    private fun setUpLoginObservers() {
+        val email = binding.etEmail.text.toString()
+        val password = binding.etPassword.text.toString()
+
+        viewModel.loginUser(email, password)
+            .onStart {
+                showProgress()
+            }
+            .onEach { result ->
+                when (result) {
+                    is Result.Success<User> -> {
+                        hideProgress()
+                        val user = result.data
+                        config.userId = mAuth.currentUser!!.uid
+                        config.userName = user.name
+                        config.userEmail = user.email
+                        config.userRole = user.user_role
+                        config.isLoggedIn = true
+                        if(user.user_role == USER_ROLE){
+                            startActivity(Intent(requireActivity(), UserActivity::class.java))
+                        } else {
+                            startActivity(Intent(requireActivity(), AdminActivity::class.java))
+                        }
+                    }
+                    is Result.Error -> {
+                        hideProgress()
+                        showToast("Login failed: ${result.exception}")
+                    }
+                    else -> {
+                        hideProgress()
+                    }
+                }
+            }
+            .launchIn(lifecycleScope)
+    }
 
     private fun validateInputData(): Boolean {
         if (binding.etEmail.text.toString().isEmpty()) {
@@ -95,13 +98,14 @@ class LoginFragment : Fragment() {
         return true
     }
 
-    override fun onAttach(context: Context) {
-        if(isAdded){
-            super.onAttach(context)
-        }else{
-            Log.i(DEBUGGING, "not attached")
-        }
-    }
+//    override fun onAttach(context: Context) {
+//        if(isAdded){
+//            super.onAttach(context)
+//        }else{
+//            Log.i(DEBUGGING, "not attached")
+//        }
+//    }
+
 
 }
 

@@ -6,10 +6,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.app_comp.databinding.ActivityUserBinding
 import com.example.app_comp.login.LoginActivity
-
-//import com.example.app_comp.UserActivityDirections
-
-
+import com.example.app_comp.login.RegisterFragment
 
 class UserActivity : AppCompatActivity() {
 
@@ -21,15 +18,7 @@ class UserActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.btnLogout.setOnClickListener {
-            config.isLoggedIn = false
-            config.userId = ""
-            config.userName = ""
-            config.userEmail = ""
-            config.userRole = ""
-            //exit here
-            val intent = Intent(this@UserActivity, LoginActivity::class.java)
-            startActivity(intent)
-            finish()
+
         }
 
         binding.btnAddComplaint.setOnClickListener {
