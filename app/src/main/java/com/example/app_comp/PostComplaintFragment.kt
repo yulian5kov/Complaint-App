@@ -26,60 +26,35 @@ class PostComplaintFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        // Inflate the layout for this fragment
         binding = FragmentPostComplaintBinding.inflate(inflater, container, false)
-        setHasOptionsMenu(true)
         return binding.root
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+    }
 
-        // Step 2: Attach the back button behavior to this fragment
-        requireActivity().onBackPressedDispatcher.addCallback(this) {
-            // Step 3: Handle the back button press
-            // In this example, we just pop the fragment off the back stack,
-            // but you could do anything you want here
-            activity?.supportFragmentManager?.popBackStack()
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.btnAddImage.setOnClickListener {
+            // handle adding image here
+        }
+
+        binding.btnPostComplaint.setOnClickListener {
+            requireActivity().supportFragmentManager.popBackStack()
         }
     }
 
 
-//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        super.onViewCreated(view, savedInstanceState)
-//
-//        binding.btnAddImage.setOnClickListener {
-//            // Add image code here
+//    override fun onActivityCreated(savedInstanceState: Bundle?) {
+//        super.onActivityCreated(savedInstanceState)
+//        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+//            requireActivity().supportFragmentManager.popBackStack()
 //        }
-//        binding.btnPostComplaint.setOnClickListener {
-//            val complaintText = binding.etComplaintText.text.toString()
-//            val complaint = Complaint(complaintText)
-//            viewModel.postComplaint(complaint)
-//        }
-//
-//        backCallback = object : OnBackPressedCallback(true) {
-//            override fun handleOnBackPressed() {
-//                requireActivity().onBackPressed()
-//            }
-//        }
-//        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backCallback)
 //    }
 
-//    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
-//
-//        if (item.itemId == android.R.id.home) {
-//            requireFragmentManager().popBackStack()
-//            return true
-//        }
-//        return super.onOptionsItemSelected(item)
-//    }
-
-//    override fun onDestroyView() {
-//        super.onDestroyView()
-//        requireActivity().onBackPressedDispatcher.removeCallback(backCallback)
-//    }
-//    fun onSupportNavigateUp(): Boolean {
-//        requireActivity().onBackPressed()
-//        return true
-//    }
 }
 

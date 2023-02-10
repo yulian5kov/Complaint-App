@@ -21,6 +21,7 @@ class UserActivity : AppCompatActivity() {
             config.logout()
             val intent = Intent(this@UserActivity, LoginActivity::class.java)
             startActivity(intent)
+            finish()
         }
 
         binding.btnAddComplaint.setOnClickListener {
@@ -32,4 +33,12 @@ class UserActivity : AppCompatActivity() {
     override fun onBackPressed() {
         finish()
     }
+    //This will remove the fragment from the fragment manager and free up any resources associated with it.
+    override fun onDestroy() {
+        super.onDestroy()
+        supportFragmentManager.beginTransaction().remove(PostComplaintFragment()).commit()
+    }
+
+
+
 }
