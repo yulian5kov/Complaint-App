@@ -7,6 +7,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
+
 class FirestoreRepository {
 
     fun addUser(user: User, password: String): Flow<Result<User>> {
@@ -60,19 +61,25 @@ class FirestoreRepository {
         }
     }
 
-    fun postComplaint(text: String, images: List<Uri>, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
-        val complaintRef = db.collection("complaints").document()
-        val complaint = hashMapOf(
-            "text" to text,
-            "images" to images.map { it.toString() }
-        )
-        complaintRef.set(complaint)
-            .addOnSuccessListener {
-                onSuccess("Complaint uploaded successfully with ID: ${complaintRef.id}")
+    fun postComplaint(complaint: Complaint): Flow<Result<Unit>> {
+        return callbackFlow {
+            db.collection("complaints")
+                .add(complaint)
+                .addOnSuccessListener {
+                    trySend(Result.Success(Unit)).isSuccess
+                }
+                .addOnFailureListener {
+                    trySend(Result.Error(it.message!!)).isSuccess
+                }
+
+            awaitClose {
+                Log.d(DEBUGGING, "Cancelling post complaint listener")
             }
-            .addOnFailureListener { exception ->
-                onFailure(exception)
-            }
+        }
     }
+
+
+
+
 
 }
