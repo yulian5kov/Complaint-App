@@ -1,5 +1,6 @@
 package com.example.app_comp
 
+import android.net.Uri
 import android.util.Log
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
@@ -59,13 +60,18 @@ class FirestoreRepository {
         }
     }
 
-    fun postComplaint(complaint: Complaint) {
-        db.collection("complaints").add(complaint)
-            .addOnSuccessListener { documentReference ->
-                Log.d("FirestoreRepository", "Complaint posted with ID: ${documentReference.id}")
+    fun postComplaint(text: String, images: List<Uri>, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
+        val complaintRef = db.collection("complaints").document()
+        val complaint = hashMapOf(
+            "text" to text,
+            "images" to images.map { it.toString() }
+        )
+        complaintRef.set(complaint)
+            .addOnSuccessListener {
+                onSuccess("Complaint uploaded successfully with ID: ${complaintRef.id}")
             }
-            .addOnFailureListener { e ->
-                Log.w("FirestoreRepository", "Error posting complaint", e)
+            .addOnFailureListener { exception ->
+                onFailure(exception)
             }
     }
 
