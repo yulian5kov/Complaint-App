@@ -2,6 +2,7 @@ package com.example.app_comp
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.app_comp.databinding.ActivityUserBinding
@@ -31,6 +32,7 @@ class UserActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+        Log.d(DEBUGGING, "putka")
         finish()
     }
     //This will remove the fragment from the fragment manager and free up any resources associated with it.

@@ -48,13 +48,12 @@ class PostComplaintFragment : Fragment() {
         }
     }
 
-
-//    override fun onActivityCreated(savedInstanceState: Bundle?) {
-//        super.onActivityCreated(savedInstanceState)
-//        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-//            requireActivity().supportFragmentManager.popBackStack()
-//        }
-//    }
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            requireActivity().supportFragmentManager.popBackStack()
+        }
+    }
 
 }
 
