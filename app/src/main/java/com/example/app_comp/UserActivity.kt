@@ -33,12 +33,18 @@ class UserActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         Log.d(DEBUGGING, "putka")
-        finish()
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStack()
+        } else {
+            super.onBackPressed()
+        }
     }
     //This will remove the fragment from the fragment manager and free up any resources associated with it.
     override fun onDestroy() {
         super.onDestroy()
-        supportFragmentManager.beginTransaction().remove(PostComplaintFragment()).commit()
+        if (!isFinishing) {
+            supportFragmentManager.beginTransaction().remove(PostComplaintFragment()).commit()
+        }
     }
 
 
