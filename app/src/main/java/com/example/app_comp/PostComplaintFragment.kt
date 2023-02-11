@@ -27,18 +27,7 @@ class PostComplaintFragment : Fragment() {
     private lateinit var backCallback: OnBackPressedCallback
     private var images: MutableList<Uri> = mutableListOf()
 
-    // for a single image
-//    private fun chooseImage() {
-//        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-//            addCategory(Intent.CATEGORY_OPENABLE)
-//            type = "image/*"
-//            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-//        }
-//        startActivityForResult(intent, REQUEST_CODE_IMAGE_PICK)
-//    }
-
     // for multiple images
-
     private fun performFileSearch() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
@@ -46,27 +35,7 @@ class PostComplaintFragment : Fragment() {
         }
         startActivityForResult(intent, READ_REQUEST_CODE)
     }
-
-    // for single image
-
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//        //requestCode == REQUEST_CODE_IMAGE_PICK
-//        if (requestCode == READ_REQUEST_CODE  && resultCode == RESULT_OK) {
-//            images.clear()
-//            if (data?.clipData != null) {
-//                for (i in 0 until data.clipData!!.itemCount) {
-//                    val imageUri: Uri = data.clipData!!.getItemAt(i).uri
-//                    images.add(imageUri)
-//                }
-//            } else if (data?.data != null) {
-//                images.add(data.data!!)
-//            }
-//        }
-//    }
-
     // for multiple images
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
@@ -77,12 +46,12 @@ class PostComplaintFragment : Fragment() {
                         for (i in 0 until clipData.itemCount) {
                             val item = clipData?.getItemAt(i)
                             val uri = item?.uri
-                            // do something with the uri
+                            Log.d(DEBUGGING, "Selected image URI: $uri")
                         }
                     }
                 } else if (it.data != null) {
                     val uri = it.data
-                    // do something with the uri
+                    Log.d(DEBUGGING, "Selected image URI: $uri")
                 }
             }
         }

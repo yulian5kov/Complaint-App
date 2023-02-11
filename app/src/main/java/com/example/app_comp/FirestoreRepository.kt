@@ -66,9 +66,11 @@ class FirestoreRepository {
             db.collection("complaints")
                 .add(complaint)
                 .addOnSuccessListener {
+                    Log.d(DEBUGGING, "Complaint added successfully")
                     trySend(Result.Success(Unit)).isSuccess
                 }
                 .addOnFailureListener {
+                    Log.d(DEBUGGING, "Error adding complaint: ${it.message}")
                     trySend(Result.Error(it.message!!)).isSuccess
                 }
 
