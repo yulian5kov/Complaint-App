@@ -28,32 +28,47 @@ class PostComplaintFragment : Fragment() {
     private var images: MutableList<Uri> = mutableListOf()
 
     // for multiple images
-    private fun performFileSearch() {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "image/*"
-        }
-        startActivityForResult(intent, READ_REQUEST_CODE)
-    }
+//    private fun performFileSearch() {
+//        try {
+//            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+//                addCategory(Intent.CATEGORY_OPENABLE)
+//                type = "image/*"
+//            }
+//            startActivityForResult(intent, READ_REQUEST_CODE)
+//        } catch (e: Exception) {
+//            Log.e(DEBUGGING, "Error in performFileSearch: ${e.message}")
+//        }
+//    }
     // for multiple images
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            data?.let {
-                if (it.clipData != null) {
-                    val clipData = it.clipData
-                    if (clipData != null) {
-                        for (i in 0 until clipData.itemCount) {
-                            val item = clipData?.getItemAt(i)
-                            val uri = item?.uri
-                            Log.d(DEBUGGING, "Selected image URI: $uri")
+        try {
+            Log.d(DEBUGGING, "resultcode equals $resultCode")
+            if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+                data?.let {
+                    if (it.clipData != null) {
+                        val clipData = it.clipData
+                        if (clipData != null) {
+                            for (i in 0 until clipData.itemCount) {
+                                val item = clipData?.getItemAt(i)
+                                val uri = item?.uri
+                                if (uri != null) {
+                                    images.add(uri)
+                                }
+                                Log.d(DEBUGGING, "Selected image URI: $uri")
+                            }
                         }
+                    } else if (it.data != null) {
+                        val uri = it.data
+                        if (uri != null) {
+                            images.add(uri)
+                        }
+                        Log.d(DEBUGGING, "Selected image URI: $uri")
                     }
-                } else if (it.data != null) {
-                    val uri = it.data
-                    Log.d(DEBUGGING, "Selected image URI: $uri")
                 }
             }
+        } catch (e: Exception) {
+            Log.e(DEBUGGING, "Error in onActivityResult: ${e.message}")
         }
     }
 
@@ -62,13 +77,22 @@ class PostComplaintFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        binding = FragmentPostComplaintBinding.inflate(inflater, container, false)
-        return binding.root
+        try {
+            // Inflate the layout for this fragment
+            binding = FragmentPostComplaintBinding.inflate(inflater, container, false)
+            return binding.root
+        } catch (e: Exception) {
+            Log.e(DEBUGGING, "Error in onCreateView: ${e.message}")
+            return null
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        try {
+            super.onCreate(savedInstanceState)
+        } catch (e: Exception) {
+            Log.e(DEBUGGING, "Error in onCreate: ${e.message}")
+        }
     }
 
 
@@ -88,6 +112,7 @@ class PostComplaintFragment : Fragment() {
         }
 
         binding.btnPostComplaint.setOnClickListener {
+            Log.d(DEBUGGING, "Button click listener registered")
             val complaint = Complaint(
                 title = binding.etTitle.text.toString(),
                 description = binding.etDescription.text.toString(),

@@ -80,8 +80,4 @@ class FirestoreRepository {
         }
     }
 
-
-
-
-
 }
