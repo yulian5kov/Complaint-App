@@ -10,6 +10,6 @@ data class Complaint(
     var userId: String = "",
     var title: String = "",
     var description: String = "",
-    var images: List<Uri> = listOf(),
+    val images: List<String> = emptyList(),
     var date: Timestamp = Timestamp.now()
 )

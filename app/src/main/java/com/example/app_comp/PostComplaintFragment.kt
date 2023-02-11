@@ -3,8 +3,10 @@ package com.example.app_comp
 import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +26,7 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 
 
 class PostComplaintFragment : Fragment() {
@@ -32,7 +35,10 @@ class PostComplaintFragment : Fragment() {
     private lateinit var backCallback: OnBackPressedCallback
     private var images: MutableList<Uri> = mutableListOf()
 
-    // for multiple images
+    fun MutableList<Uri>.toStringList(): List<String> {
+        return this.map { it.toString() }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         try {
@@ -46,7 +52,13 @@ class PostComplaintFragment : Fragment() {
                                 val item = clipData?.getItemAt(i)
                                 val uri = item?.uri
                                 if (uri != null) {
-                                    images.add(uri)
+                                    val bitmap = MediaStore.Images.Media.getBitmap(activity?.contentResolver, uri)
+                                    val stream = ByteArrayOutputStream()
+                                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                                    val byteArray = stream.toByteArray()
+                                    val uriString = uri.toString()
+                                    val imageUri = Uri.parse(uriString)
+                                    images.add(imageUri)
                                 }
                                 Log.d(DEBUGGING, "Selected image URI: $uri")
                             }
@@ -54,7 +66,13 @@ class PostComplaintFragment : Fragment() {
                     } else if (it.data != null) {
                         val uri = it.data
                         if (uri != null) {
-                            images.add(uri)
+                            val bitmap = MediaStore.Images.Media.getBitmap(activity?.contentResolver, uri)
+                            val stream = ByteArrayOutputStream()
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                            val byteArray = stream.toByteArray()
+                            val uriString = uri.toString()
+                            val imageUri = Uri.parse(uriString)
+                            images.add(imageUri)
                         }
                         Log.d(DEBUGGING, "Selected image URI: $uri")
                     }
@@ -112,7 +130,7 @@ class PostComplaintFragment : Fragment() {
             val complaint = Complaint(
                 title = binding.etTitle.text.toString(),
                 description = binding.etDescription.text.toString(),
-                images = images
+                images = images.toStringList(),
             )
             //viewModel.postComplaint(complaint)
             lifecycleScope.launch {
