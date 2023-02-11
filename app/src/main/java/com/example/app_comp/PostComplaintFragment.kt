@@ -19,6 +19,11 @@ import com.example.app_comp.databinding.FragmentPostComplaintBinding
 import kotlin.system.exitProcess
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 
 class PostComplaintFragment : Fragment() {
@@ -109,7 +114,27 @@ class PostComplaintFragment : Fragment() {
                 description = binding.etDescription.text.toString(),
                 images = images
             )
-            viewModel.postComplaint(complaint)
+            //viewModel.postComplaint(complaint)
+            lifecycleScope.launch {
+                when (val result = viewModel.postComplaint(complaint).first()) {
+                    is Result.Success -> {
+                        Log.d(DEBUGGING, "Complaint added successfully")
+                        Snackbar.make(userbinding.root, "Complaint posted", Snackbar.LENGTH_LONG).show()
+                    }
+                    is Result.Error -> {
+                        Log.d(DEBUGGING, "Error posting complaint: ${result.exception}")
+                        Snackbar.make(userbinding.root, "Error posting complaint", Snackbar.LENGTH_LONG).show()
+                    }
+                    is Result.Failed -> {
+                        Log.d(DEBUGGING, "Error posting complaint: ${result.error} message:${result.message}")
+                        Snackbar.make(userbinding.root, "Failed posting complaint", Snackbar.LENGTH_LONG).show()
+                    }
+                    is Result.Loading -> {
+                        Log.d(DEBUGGING, "Loading posting complaint: ${result.isLoading}")
+                        showProgress()
+                    }
+                }
+            }
             requireActivity().supportFragmentManager.popBackStack()
         }
     }

@@ -71,11 +71,11 @@ class FirestoreRepository {
                         trySend(Result.Success(Unit)).isSuccess
                     }
                     .addOnFailureListener {
-                        Log.d(DEBUGGING, "Error adding complaint: ${it.message}")
+                        Log.d(DEBUGGING, "ofl: Error adding complaint: ${it.message}")
                         trySend(Result.Error(it.message!!)).isSuccess
                     }
             } catch (e: Exception) {
-                Log.d(DEBUGGING, "Error adding complaint: ${e.message}")
+                Log.d(DEBUGGING, "e: Error adding complaint: ${e.message}")
                 trySend(Result.Error(e.message!!)).isSuccess
             }
             awaitClose {
