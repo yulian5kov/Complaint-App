@@ -13,7 +13,12 @@ class UserActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityUserBinding
 
+    fun getBinding(): ActivityUserBinding {
+        return binding
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        //
         super.onCreate(savedInstanceState)
         binding = ActivityUserBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -39,6 +44,8 @@ class UserActivity : AppCompatActivity() {
             super.onBackPressed()
         }
     }
+
+
     //This will remove the fragment from the fragment manager and free up any resources associated with it.
     override fun onDestroy() {
         super.onDestroy()

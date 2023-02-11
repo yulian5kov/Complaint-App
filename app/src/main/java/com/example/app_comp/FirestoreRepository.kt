@@ -63,21 +63,27 @@ class FirestoreRepository {
 
     fun postComplaint(complaint: Complaint): Flow<Result<Unit>> {
         return callbackFlow {
-            db.collection("complaints")
-                .add(complaint)
-                .addOnSuccessListener {
-                    Log.d(DEBUGGING, "Complaint added successfully")
-                    trySend(Result.Success(Unit)).isSuccess
-                }
-                .addOnFailureListener {
-                    Log.d(DEBUGGING, "Error adding complaint: ${it.message}")
-                    trySend(Result.Error(it.message!!)).isSuccess
-                }
-
+            try {
+                db.collection("complaints")
+                    .add(complaint)
+                    .addOnSuccessListener {
+                        Log.d(DEBUGGING, "Complaint added successfully")
+                        trySend(Result.Success(Unit)).isSuccess
+                    }
+                    .addOnFailureListener {
+                        Log.d(DEBUGGING, "Error adding complaint: ${it.message}")
+                        trySend(Result.Error(it.message!!)).isSuccess
+                    }
+            } catch (e: Exception) {
+                Log.d(DEBUGGING, "Error adding complaint: ${e.message}")
+                trySend(Result.Error(e.message!!)).isSuccess
+            }
             awaitClose {
                 Log.d(DEBUGGING, "Cancelling post complaint listener")
             }
         }
     }
+
+
 
 }

@@ -28,22 +28,10 @@ class PostComplaintFragment : Fragment() {
     private var images: MutableList<Uri> = mutableListOf()
 
     // for multiple images
-//    private fun performFileSearch() {
-//        try {
-//            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-//                addCategory(Intent.CATEGORY_OPENABLE)
-//                type = "image/*"
-//            }
-//            startActivityForResult(intent, READ_REQUEST_CODE)
-//        } catch (e: Exception) {
-//            Log.e(DEBUGGING, "Error in performFileSearch: ${e.message}")
-//        }
-//    }
-    // for multiple images
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         try {
-            Log.d(DEBUGGING, "resultcode equals $resultCode")
+            Log.d(DEBUGGING, "resultcode equals $resultCode and RESULT_OK equals $RESULT_OK")
             if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
                 data?.let {
                     if (it.clipData != null) {
@@ -98,6 +86,9 @@ class PostComplaintFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val userActivity = activity as UserActivity
+        val userbinding = userActivity.getBinding()
 
         binding.btnAddImage.setOnClickListener {
             val intent = Intent().apply {
