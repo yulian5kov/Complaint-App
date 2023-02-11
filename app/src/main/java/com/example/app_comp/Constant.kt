@@ -13,3 +13,6 @@ const val USER_ROLE = "User"
 const val ADMIN_ROLE = "Admin"
 
 const val DEBUGGING = "debugging"
+
+const val REQUEST_CODE_IMAGE_PICK = 1
+const val READ_REQUEST_CODE = 42
