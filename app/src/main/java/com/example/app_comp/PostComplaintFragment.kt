@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
+import java.util.*
 
 
 class PostComplaintFragment : Fragment() {
@@ -34,6 +35,7 @@ class PostComplaintFragment : Fragment() {
     private val viewModel: UserViewModel by viewModels()
     private lateinit var backCallback: OnBackPressedCallback
     private var images: MutableList<Uri> = mutableListOf()
+
 
     private fun MutableList<Uri>.toStringList(): List<String> {
         return this.map { it.toString() }
@@ -60,6 +62,16 @@ class PostComplaintFragment : Fragment() {
                                     val uriString = uri.toString()
                                     val imageUri = Uri.parse(uriString)
                                     images.add(imageUri)
+
+                                    val storageReference = storage.reference.child("images/${UUID.randomUUID()}")
+                                    val uploadTask = storageReference.putBytes(byteArray)
+
+                                    uploadTask.addOnSuccessListener {
+                                        Log.d(DEBUGGING, "Image uploaded successfully")
+                                    }
+                                    uploadTask.addOnFailureListener { exception ->
+                                        Log.e(DEBUGGING, "Error uploading image: ${exception.message}")
+                                    }
                                 }
                                 Log.d(DEBUGGING, "Selected image URI: $uri")
                             }
@@ -74,6 +86,16 @@ class PostComplaintFragment : Fragment() {
                             val uriString = uri.toString()
                             val imageUri = Uri.parse(uriString)
                             images.add(imageUri)
+
+                            val storageReference = storage.reference.child("images/${UUID.randomUUID()}")
+                            val uploadTask = storageReference.putBytes(byteArray)
+
+                            uploadTask.addOnSuccessListener {
+                                Log.d(DEBUGGING, "Image uploaded successfully")
+                            }
+                            uploadTask.addOnFailureListener { exception ->
+                                Log.e(DEBUGGING, "Error uploading image: ${exception.message}")
+                            }
                         }
                         Log.d(DEBUGGING, "Selected image URI: $uri")
                     }
@@ -166,7 +188,6 @@ class PostComplaintFragment : Fragment() {
             }
         })
     }
-
 
 }
 
