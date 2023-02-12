@@ -35,7 +35,7 @@ class PostComplaintFragment : Fragment() {
     private lateinit var backCallback: OnBackPressedCallback
     private var images: MutableList<Uri> = mutableListOf()
 
-    fun MutableList<Uri>.toStringList(): List<String> {
+    private fun MutableList<Uri>.toStringList(): List<String> {
         return this.map { it.toString() }
     }
 
@@ -43,7 +43,8 @@ class PostComplaintFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         try {
             Log.d(DEBUGGING, "resultcode equals $resultCode and RESULT_OK equals $RESULT_OK")
-            if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            Log.d(DEBUGGING, "requestCode equals $requestCode")
+            if (requestCode == REQUEST_CODE_IMAGE_PICK && resultCode == Activity.RESULT_OK) {
                 data?.let {
                     if (it.clipData != null) {
                         val clipData = it.clipData
