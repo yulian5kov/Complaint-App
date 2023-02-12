@@ -21,4 +21,18 @@
         android:maxLines="3"
         android:ellipsize="end" />
 
+    <LinearLayout
+        android:id="@+id/linear_layout_image_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/image_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="centerCrop"/>
+
+    </LinearLayout>
+
 </LinearLayout>
