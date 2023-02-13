@@ -37,6 +37,7 @@ class PostComplaintFragment : Fragment() {
     private var images: MutableList<Uri> = mutableListOf()
 
 
+
     private fun MutableList<Uri>.toStringList(): List<String> {
         return this.map { it.toString() }
     }
@@ -114,6 +115,9 @@ class PostComplaintFragment : Fragment() {
         try {
             // Inflate the layout for this fragment
             binding = FragmentPostComplaintBinding.inflate(inflater, container, false)
+
+            (activity as UserActivity).setButtonInvisible()
+
             return binding.root
         } catch (e: Exception) {
             Log.e(DEBUGGING, "Error in onCreateView: ${e.message}")
@@ -187,6 +191,11 @@ class PostComplaintFragment : Fragment() {
                 requireFragmentManager().popBackStack()
             }
         })
+    }
+
+    override fun onPause() {
+        super.onPause()
+        (activity as UserActivity).setButtonVisible()
     }
 
 }
