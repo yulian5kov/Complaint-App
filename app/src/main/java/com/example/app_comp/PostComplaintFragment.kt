@@ -33,7 +33,7 @@ import java.util.*
 class PostComplaintFragment : Fragment() {
     private lateinit var binding: FragmentPostComplaintBinding
     private val viewModel: UserViewModel by viewModels()
-    private lateinit var backCallback: OnBackPressedCallback
+    //private lateinit var backCallback: OnBackPressedCallback
     private var images: MutableList<Uri> = mutableListOf()
 
 
@@ -120,7 +120,7 @@ class PostComplaintFragment : Fragment() {
 
             return binding.root
         } catch (e: Exception) {
-            Log.e(DEBUGGING, "Error in onCreateView: ${e.message}")
+            Log.e(DEBUGGING, "pcf: Error in onCreateView: ${e.message}")
             return null
         }
     }
@@ -129,7 +129,7 @@ class PostComplaintFragment : Fragment() {
         try {
             super.onCreate(savedInstanceState)
         } catch (e: Exception) {
-            Log.e(DEBUGGING, "Error in onCreate: ${e.message}")
+            Log.e(DEBUGGING, "pcf: Error in onCreate: ${e.message}")
         }
     }
 

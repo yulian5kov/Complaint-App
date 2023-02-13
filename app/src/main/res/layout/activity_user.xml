@@ -29,12 +29,21 @@
         />
 
     <Button
+        android:id="@+id/btn_view_complaints"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@id/btn_add_complaint"
+        android:text="View complaints"
+        android:textSize="15sp"/>
+
+    <Button
         android:id="@+id/btn_add_complaint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:text="Post a new complaint"
+        android:text="Post a complaint"
         android:textSize="15sp"/>
 
 </RelativeLayout>

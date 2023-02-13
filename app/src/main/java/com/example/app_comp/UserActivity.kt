@@ -15,13 +15,16 @@ class UserActivity : AppCompatActivity() {
     private lateinit var binding: ActivityUserBinding
     //val btnAddComplaint: Button? = findViewById<Button>(R.id.btn_add_complaint)
     private lateinit var btnAddComplaint: Button
+    private lateinit var btnViewComplaint: Button
 
     fun setButtonInvisible() {
         btnAddComplaint.visibility = View.GONE
+        btnViewComplaint.visibility = View.GONE
     }
 
     fun setButtonVisible() {
         btnAddComplaint.visibility = View.VISIBLE
+        btnViewComplaint.visibility = View.VISIBLE
     }
 
     fun getBinding(): ActivityUserBinding {
@@ -35,6 +38,7 @@ class UserActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         btnAddComplaint = findViewById(R.id.btn_add_complaint)
+        btnViewComplaint = findViewById(R.id.btn_view_complaints)
 
         binding.btnLogout.setOnClickListener {
             config.logout()
@@ -46,6 +50,11 @@ class UserActivity : AppCompatActivity() {
         binding.btnAddComplaint.setOnClickListener {
             binding.btnLogout.visibility = View.GONE
             replaceFragment(PostComplaintFragment())
+        }
+
+        binding.btnViewComplaints.setOnClickListener {
+            binding.btnLogout.visibility = View.GONE
+            replaceFragment(ViewComplaintFragment())
         }
     }
 
