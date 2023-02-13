@@ -22,7 +22,6 @@ import kotlin.system.exitProcess
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
@@ -36,7 +35,6 @@ class PostComplaintFragment : Fragment() {
     private val viewModel: UserViewModel by viewModels()
     private lateinit var backCallback: OnBackPressedCallback
     private var images: MutableList<Uri> = mutableListOf()
-    private lateinit var complaintAdapter: ComplaintAdapter
 
 
     private fun MutableList<Uri>.toStringList(): List<String> {
@@ -137,10 +135,6 @@ class PostComplaintFragment : Fragment() {
 
         val userActivity = activity as UserActivity
         val userbinding = userActivity.getBinding()
-
-        complaintAdapter = ComplaintAdapter(this)
-        binding.rvComplaintImages.layoutManager = GridLayoutManager(context, 3)
-        binding.rvComplaintImages.adapter = complaintAdapter
 
         binding.btnAddImage.setOnClickListener {
             val intent = Intent().apply {
