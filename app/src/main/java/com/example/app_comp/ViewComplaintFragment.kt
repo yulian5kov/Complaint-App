@@ -65,7 +65,9 @@ class ViewComplaintFragment : Fragment() {
                     is Result.Success -> {
                         Log.d(DEBUGGING, "Complaints fetched successfully")
                         // Do something with the fetched complaints
-                        val complaintAdapter = ComplaintAdapter(result.data)
+                        val filteredComplaints = result.data.filter { it.userId == config.userId }
+                        //val complaintAdapter = ComplaintAdapter(result.data)
+                        val complaintAdapter = ComplaintAdapter(filteredComplaints)
                         binding.recyclerViewComplaints.adapter = complaintAdapter
                     }
                     is Result.Error -> {
