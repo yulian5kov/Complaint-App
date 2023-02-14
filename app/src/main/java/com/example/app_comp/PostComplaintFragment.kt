@@ -158,9 +158,11 @@ class PostComplaintFragment : Fragment() {
                 title = binding.etTitle.text.toString(),
                 description = binding.etDescription.text.toString(),
                 images = images.toStringList(),
+                userId = mAuth.currentUser!!.uid
             )
             //viewModel.postComplaint(complaint)
             lifecycleScope.launch {
+                Log.d(DEBUGGING, "krava userId = ${config.userId}")
                 when (val result = viewModel.postComplaint(complaint).first()) {
                     is Result.Success -> {
                         Log.d(DEBUGGING, "Complaint added successfully")
