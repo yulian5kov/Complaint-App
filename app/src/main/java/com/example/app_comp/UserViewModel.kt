@@ -19,4 +19,11 @@ class UserViewModel : ViewModel()  {
         return result
     }
 
+    fun getComplaints(): Flow<Result<List<Complaint>>> {
+        Log.d(DEBUGGING, "getting complaint:")
+        val result = repo.getComplaints()
+        Log.d(DEBUGGING, "getting gotten")
+        return result
+    }
+
 }

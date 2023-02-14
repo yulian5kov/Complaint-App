@@ -164,15 +164,15 @@ class PostComplaintFragment : Fragment() {
                 when (val result = viewModel.postComplaint(complaint).first()) {
                     is Result.Success -> {
                         Log.d(DEBUGGING, "Complaint added successfully")
-                        Snackbar.make(userbinding.root, "Complaint posted", Snackbar.LENGTH_LONG).show()
+                        showToast("Complaint posted")
                     }
                     is Result.Error -> {
                         Log.d(DEBUGGING, "Error posting complaint: ${result.exception}")
-                        Snackbar.make(userbinding.root, "Error posting complaint", Snackbar.LENGTH_LONG).show()
+                        showToast("Error posting complaint")
                     }
                     is Result.Failed -> {
                         Log.d(DEBUGGING, "Error posting complaint: ${result.error} message:${result.message}")
-                        Snackbar.make(userbinding.root, "Failed posting complaint", Snackbar.LENGTH_LONG).show()
+                        showToast("Failed posting complaint")
                     }
                     is Result.Loading -> {
                         Log.d(DEBUGGING, "Loading posting complaint: ${result.isLoading}")

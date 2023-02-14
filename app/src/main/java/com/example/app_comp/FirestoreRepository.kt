@@ -84,6 +84,25 @@ class FirestoreRepository {
         }
     }
 
+    fun getComplaints(): Flow<Result<List<Complaint>>> {
+        return callbackFlow {
+            try {
+                db.collection("complaints")
+                    .get()
+                    .addOnSuccessListener { result ->
+                        trySend(Result.Success(result.toObjects(Complaint::class.java)))
+                    }
+                    .addOnFailureListener { exception ->
+                        trySend(Result.Error(exception.message!!))
+                    }
+            } catch (e: Exception) {
+                trySend(Result.Error(e.message!!))
+            }
+            awaitClose {
+                Log.d(DEBUGGING, "Cancelling get complaints listener")
+            }
+        }
+    }
 
 
 }
