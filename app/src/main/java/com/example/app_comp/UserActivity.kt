@@ -20,11 +20,13 @@ class UserActivity : AppCompatActivity() {
     fun setButtonInvisible() {
         btnAddComplaint.visibility = View.GONE
         btnViewComplaint.visibility = View.GONE
+        binding.btnLogout.visibility = View.GONE
     }
 
     fun setButtonVisible() {
         btnAddComplaint.visibility = View.VISIBLE
         btnViewComplaint.visibility = View.VISIBLE
+        binding.btnLogout.visibility = View.VISIBLE
     }
 
     fun getBinding(): ActivityUserBinding {
@@ -48,7 +50,6 @@ class UserActivity : AppCompatActivity() {
         }
 
         binding.btnAddComplaint.setOnClickListener {
-            binding.btnLogout.visibility = View.GONE
             replaceFragment(PostComplaintFragment())
         }
 
