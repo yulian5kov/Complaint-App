@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.app_comp.databinding.FragmentPostComplaintBinding
@@ -14,12 +15,14 @@ import com.example.app_comp.databinding.FragmentViewComplaintBinding
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import androidx.fragment.app.viewModels
 
 class ViewComplaintFragment : Fragment() {
 
     private lateinit var binding: FragmentViewComplaintBinding
     private lateinit var complaintAdapter: ComplaintAdapter
-    private lateinit var viewModel: UserViewModel
+    private val  viewModel: UserViewModel by viewModels()
+    private var complaints = emptyList<Complaint>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         try {
@@ -39,7 +42,8 @@ class ViewComplaintFragment : Fragment() {
             (activity as UserActivity).setButtonInvisible()
 
             // Set up the RecyclerView
-            complaintAdapter = ComplaintAdapter()
+
+            complaintAdapter = ComplaintAdapter(complaints)
             binding.recyclerViewComplaints.adapter = complaintAdapter
             binding.recyclerViewComplaints.layoutManager = LinearLayoutManager(context)
 
@@ -55,22 +59,27 @@ class ViewComplaintFragment : Fragment() {
 
     private fun bindViewModel(viewModel: UserViewModel) {
         lifecycleScope.launch {
-            when (val result = viewModel.getComplaints().first()) {
-                is Result.Success -> {
-                    Log.d(DEBUGGING, "Complaints fetched successfully")
-                    // Do something with the fetched complaints
-                }
-                is Result.Error -> {
-                    Log.d(DEBUGGING, "Error fetching complaints: ${result.exception}")
-                    showToast("Error fetching complaints")
-                }
-                is Result.Failed -> {
-                    Log.d(DEBUGGING, "Error fetching complaints: ${result.error} message:${result.message}")
-                    showToast("Failed fetching complaints")
-                }
-                is Result.Loading -> {
-                    Log.d(DEBUGGING, "Loading fetching complaints: ${result.isLoading}")
-                    showProgress()
+            viewModel.getComplaints().collect { result ->
+                //val result = viewModel.getComplaints().first()
+                when (result) {
+                    is Result.Success -> {
+                        Log.d(DEBUGGING, "Complaints fetched successfully")
+                        // Do something with the fetched complaints
+                        val complaintAdapter = ComplaintAdapter(result.data)
+                        binding.recyclerViewComplaints.adapter = complaintAdapter
+                    }
+                    is Result.Error -> {
+                        Log.d(DEBUGGING, "Error fetching complaints: ${result.exception}")
+                        showToast("Error fetching complaints")
+                    }
+                    is Result.Failed -> {
+                        Log.d(DEBUGGING, "Error fetching complaints: ${result.error} message:${result.message}")
+                        showToast("Failed fetching complaints")
+                    }
+                    is Result.Loading -> {
+                        Log.d(DEBUGGING, "Loading fetching complaints: ${result.isLoading}")
+                        showProgress()
+                    }
                 }
             }
         }

@@ -7,10 +7,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 //private val onClickListener: OnClickListener
-class ComplaintAdapter() :
+class ComplaintAdapter(private var complaints: List<Complaint>) :
     RecyclerView.Adapter<ComplaintAdapter.ComplaintViewHolder>() {
 
-    private var complaints = emptyList<Complaint>()
+    //private var complaints = emptyList<Complaint>()
 
     inner class ComplaintViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 //        fun bind(complaint: Complaint) {
