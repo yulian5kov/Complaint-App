@@ -82,11 +82,19 @@ class ViewComplaintFragment : Fragment() {
                 when (result) {
                     is Result.Success -> {
                         Log.d(DEBUGGING, "Complaints fetched successfully")
-                        // Do something with the fetched complaints
-                        val filteredComplaints = result.data.filter { it.userId == config.userId }
-                        //val complaintAdapter = ComplaintAdapter(result.data)
-                        val complaintAdapter = ComplaintAdapter(filteredComplaints)
-                        binding.recyclerViewComplaints.adapter = complaintAdapter
+
+                        if(config.userRole == ADMIN_ROLE){
+                            // Do something with the fetched complaints
+                            val complaintAdapter = ComplaintAdapter(result.data)
+                            //val complaintAdapter = ComplaintAdapter(filteredComplaints)
+                            binding.recyclerViewComplaints.adapter = complaintAdapter
+                        }else if (config.userRole == USER_ROLE){
+                            // Do something with the fetched complaints
+                            val filteredComplaints = result.data.filter { it.userId == config.userId }
+                            //val complaintAdapter = ComplaintAdapter(result.data)
+                            val complaintAdapter = ComplaintAdapter(filteredComplaints)
+                            binding.recyclerViewComplaints.adapter = complaintAdapter
+                        }
                     }
                     is Result.Error -> {
                         Log.d(DEBUGGING, "Error fetching complaints: ${result.exception}")
