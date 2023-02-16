@@ -1,5 +1,6 @@
 package com.example.app_comp
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -23,6 +24,23 @@ class ViewComplaintFragment : Fragment() {
     private lateinit var complaintAdapter: ComplaintAdapter
     private val  viewModel: UserViewModel by viewModels()
     private var complaints = emptyList<Complaint>()
+    private var buttonListener: ButtonVisibilityListener? = null
+
+    interface ButtonVisibilityListener {
+        fun setButtonVisible()
+        fun setButtonInvisible()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        // Set the button visibility listener based on the parent activity
+        if (context is ButtonVisibilityListener) {
+            buttonListener = context
+        } else {
+            throw RuntimeException("$context must implement ButtonVisibilityListener")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         try {
@@ -39,7 +57,7 @@ class ViewComplaintFragment : Fragment() {
         try {
             // Inflate the layout for this fragment
             binding = FragmentViewComplaintBinding.inflate(inflater, container, false)
-            (activity as UserActivity).setButtonInvisible()
+            //(activity as UserActivity).setButtonInvisible()
 
             // Set up the RecyclerView
 
@@ -98,8 +116,9 @@ class ViewComplaintFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        (activity as UserActivity).setButtonVisible()
-        (activity as AdminActivity).setButtonVisible()
+        //(activity as UserActivity).setButtonVisible()
+        //(activity as AdminActivity).setButtonVisible()
+        buttonListener?.setButtonVisible()
     }
 
 }

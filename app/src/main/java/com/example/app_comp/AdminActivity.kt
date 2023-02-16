@@ -8,16 +8,16 @@ import android.view.View
 import com.example.app_comp.databinding.ActivityAdminBinding
 import com.example.app_comp.login.LoginActivity
 
-class AdminActivity : AppCompatActivity() {
+class AdminActivity : AppCompatActivity(), ViewComplaintFragment.ButtonVisibilityListener {
 
     private lateinit var binding: ActivityAdminBinding
 
-    fun setButtonInvisible() {
+    override fun setButtonInvisible() {
         binding.btnViewComplaints.visibility = View.GONE
         binding.btnLogout.visibility = View.GONE
     }
 
-    fun setButtonVisible() {
+    override fun setButtonVisible() {
         binding.btnViewComplaints.visibility = View.VISIBLE
         binding.btnLogout.visibility = View.VISIBLE
     }

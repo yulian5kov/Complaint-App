@@ -10,19 +10,19 @@ import com.example.app_comp.databinding.ActivityUserBinding
 import com.example.app_comp.login.LoginActivity
 
 
-class UserActivity : AppCompatActivity() {
+class UserActivity : AppCompatActivity(), ViewComplaintFragment.ButtonVisibilityListener  {
 
     private lateinit var binding: ActivityUserBinding
     private lateinit var btnAddComplaint: Button
     private lateinit var btnViewComplaint: Button
 
-    fun setButtonInvisible() {
+    override fun setButtonInvisible() {
         btnAddComplaint.visibility = View.GONE
         btnViewComplaint.visibility = View.GONE
         binding.btnLogout.visibility = View.GONE
     }
 
-    fun setButtonVisible() {
+    override fun setButtonVisible() {
         btnAddComplaint.visibility = View.VISIBLE
         btnViewComplaint.visibility = View.VISIBLE
         binding.btnLogout.visibility = View.VISIBLE
