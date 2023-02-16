@@ -7,12 +7,11 @@ const val USER_EMAIL = "userEmail"
 const val USER_ID = "userId"
 const val IS_LOGGED_IN = "isLoggedIn"
 
-const val POST_COMPLAINT_FRAGMENT = "PostComplaintFragment"
-
 const val USER_ROLE = "User"
 const val ADMIN_ROLE = "Admin"
 
 const val DEBUGGING = "debugging"
 
 const val REQUEST_CODE_IMAGE_PICK = 1
-const val READ_REQUEST_CODE = 42
+
+const val REQUEST_LOCATION_PERMISSION = 1

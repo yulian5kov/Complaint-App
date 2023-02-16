@@ -11,5 +11,6 @@ data class Complaint(
     var title: String = "",
     var description: String = "",
     val images: List<String> = emptyList(),
-    var date: Timestamp = Timestamp.now()
+    var date: Timestamp = Timestamp.now(),
+    var location: String = ""
 )
