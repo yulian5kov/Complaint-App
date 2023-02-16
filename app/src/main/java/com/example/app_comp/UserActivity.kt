@@ -13,7 +13,6 @@ import com.example.app_comp.login.LoginActivity
 class UserActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityUserBinding
-    //val btnAddComplaint: Button? = findViewById<Button>(R.id.btn_add_complaint)
     private lateinit var btnAddComplaint: Button
     private lateinit var btnViewComplaint: Button
 
@@ -27,10 +26,6 @@ class UserActivity : AppCompatActivity() {
         btnAddComplaint.visibility = View.VISIBLE
         btnViewComplaint.visibility = View.VISIBLE
         binding.btnLogout.visibility = View.VISIBLE
-    }
-
-    fun getBinding(): ActivityUserBinding {
-        return binding
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,7 +55,7 @@ class UserActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        Log.d(DEBUGGING, "putka")
+        Log.d(DEBUGGING, "onbackpressed entered in useractivity")
         if (supportFragmentManager.backStackEntryCount > 0) {
             supportFragmentManager.popBackStack()
         } else {
@@ -74,6 +69,7 @@ class UserActivity : AppCompatActivity() {
         super.onDestroy()
         if (!isFinishing) {
             supportFragmentManager.beginTransaction().remove(PostComplaintFragment()).commit()
+            supportFragmentManager.beginTransaction().remove(ViewComplaintFragment()).commit()
         }
     }
 

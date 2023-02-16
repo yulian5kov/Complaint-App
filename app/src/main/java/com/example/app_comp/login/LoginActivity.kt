@@ -26,6 +26,7 @@ class LoginActivity : AppCompatActivity() {
                 finish()
             }
             if(config.userRole == ADMIN_ROLE){
+                Log.d(DEBUGGING, "everest")
                 startActivity(Intent(this, AdminActivity::class.java))
                 finish()
             }
@@ -34,8 +35,4 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-//    override fun onDestroy() {
-//        super.onDestroy()
-//        config.logout()
-//    }
 }

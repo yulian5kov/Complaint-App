@@ -99,6 +99,7 @@ class ViewComplaintFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         (activity as UserActivity).setButtonVisible()
+        (activity as AdminActivity).setButtonVisible()
     }
 
 }
