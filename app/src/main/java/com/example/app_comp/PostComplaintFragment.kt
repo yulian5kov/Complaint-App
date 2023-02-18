@@ -16,11 +16,16 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.app_comp.databinding.FragmentPostComplaintBinding
 import com.google.android.gms.location.*
 import kotlinx.coroutines.flow.first
@@ -29,11 +34,16 @@ import java.io.ByteArrayOutputStream
 import java.util.*
 
 
-class PostComplaintFragment : Fragment() {
+class PostComplaintFragment : Fragment(){
     private lateinit var binding: FragmentPostComplaintBinding
     private val viewModel: UserViewModel by viewModels()
     private var images: MutableList<Uri> = mutableListOf()
 
+    private lateinit var imageAdapter: ImageAdapter
+
+
+    private val REQUEST_CODE_IMAGE_PICKER = 1
+    private lateinit var imageUri: Uri
     private fun MutableList<Uri>.toStringList(): List<String> {
         return this.map { it.toString() }
     }
@@ -60,11 +70,13 @@ class PostComplaintFragment : Fragment() {
                                     val imageUri = Uri.parse(uriString)
                                     images.add(imageUri)
 
+
                                     val storageReference = storage.reference.child("images/${UUID.randomUUID()}")
                                     val uploadTask = storageReference.putBytes(byteArray)
 
                                     uploadTask.addOnSuccessListener {
                                         Log.d(DEBUGGING, "Image uploaded successfully")
+                                        imageAdapter.addImage(imageUri)
                                     }
                                     uploadTask.addOnFailureListener { exception ->
                                         Log.e(DEBUGGING, "Error uploading image: ${exception.message}")
@@ -89,6 +101,7 @@ class PostComplaintFragment : Fragment() {
 
                             uploadTask.addOnSuccessListener {
                                 Log.d(DEBUGGING, "Image uploaded successfully")
+                                imageAdapter.addImage(imageUri)
                             }
                             uploadTask.addOnFailureListener { exception ->
                                 Log.e(DEBUGGING, "Error uploading image: ${exception.message}")
@@ -111,6 +124,8 @@ class PostComplaintFragment : Fragment() {
 
             (activity as UserActivity).setButtonInvisible()
 
+
+
             return binding.root
         } catch (e: Exception) {
             Log.e(DEBUGGING, "pcf: Error in onCreateView: ${e.message}")
@@ -126,9 +141,25 @@ class PostComplaintFragment : Fragment() {
         }
     }
 
+    private fun openImagePicker() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+        startActivityForResult(intent, REQUEST_CODE_IMAGE_PICKER)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        //
+        imageAdapter = ImageAdapter(requireContext())
+
+        binding.btnAddImage.setOnClickListener {
+            openImagePicker()
+        }
+
+        binding.rvImages.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.rvImages.adapter = imageAdapter
+        //
 
         binding.btnAddLocation.setOnClickListener {
             if (ActivityCompat.checkSelfPermission(
