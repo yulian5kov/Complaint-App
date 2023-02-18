@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import androidx.fragment.app.viewModels
 
-class ViewComplaintFragment : Fragment() {
+class ViewComplaintFragment : Fragment(){
 
     private lateinit var binding: FragmentViewComplaintBinding
     private lateinit var complaintAdapter: ComplaintAdapter
@@ -58,6 +58,8 @@ class ViewComplaintFragment : Fragment() {
             // Inflate the layout for this fragment
             binding = FragmentViewComplaintBinding.inflate(inflater, container, false)
             //(activity as UserActivity).setButtonInvisible()
+
+
 
             // Set up the RecyclerView
 
@@ -128,5 +130,21 @@ class ViewComplaintFragment : Fragment() {
         //(activity as AdminActivity).setButtonVisible()
         buttonListener?.setButtonVisible()
     }
+
+//    companion object {
+//        fun newInstance(complaint: Complaint): EditComplaintFragment {
+//            val args = Bundle()
+//            args.putParcelable("complaint", complaint)
+//            val fragment = EditComplaintFragment()
+//            fragment.arguments = args
+//            return fragment
+//        }
+//    }
+//
+//    override fun onComplaintItemClicked(complaint: Complaint) {
+//        val editComplaintFragment = EditComplaintFragment.newInstance(complaint)
+//        requireActivity().replaceFragment(editComplaintFragment)
+//    }
+
 
 }

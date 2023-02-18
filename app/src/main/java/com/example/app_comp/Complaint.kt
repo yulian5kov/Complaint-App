@@ -12,5 +12,6 @@ data class Complaint(
     var description: String = "",
     val images: List<String> = emptyList(),
     var date: Timestamp = Timestamp.now(),
-    var location: String = ""
+    var location: String = "",
+    var status: String = "Pending"
 )

@@ -34,9 +34,6 @@ class PostComplaintFragment : Fragment() {
     private val viewModel: UserViewModel by viewModels()
     private var images: MutableList<Uri> = mutableListOf()
 
-    private var fusedLocationClient: FusedLocationProviderClient? = null
-    private val currentLocation: Location? = null
-
     private fun MutableList<Uri>.toStringList(): List<String> {
         return this.map { it.toString() }
     }
@@ -173,7 +170,6 @@ class PostComplaintFragment : Fragment() {
                 userId = mAuth.currentUser!!.uid,
                 location = binding.tvLocation.text.toString()
             )
-            //viewModel.postComplaint(complaint)
             lifecycleScope.launch {
                 Log.d(DEBUGGING, "krava userId = ${config.userId}")
                 when (val result = viewModel.postComplaint(complaint).first()) {

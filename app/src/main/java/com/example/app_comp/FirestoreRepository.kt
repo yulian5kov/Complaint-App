@@ -1,8 +1,6 @@
 package com.example.app_comp
 
-import android.net.Uri
 import android.util.Log
-import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -104,5 +102,37 @@ class FirestoreRepository {
         }
     }
 
+    fun getComplaintById(id: String): Flow<Result<Complaint>> = callbackFlow {
+        val docRef = db.collection("complaints").document(id)
+        val subscription = docRef.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                trySend(Result.Error(error.message ?: "Unknown error"))
+            } else if (snapshot != null && snapshot.exists()) {
+                val complaint = snapshot.toObject(Complaint::class.java)
+                if (complaint != null) {
+                    trySend(Result.Success(complaint))
+                } else {
+                    trySend(Result.Error("Failed to convert snapshot to Complaint"))
+                }
+            } else {
+                trySend(Result.Error("No such document"))
+            }
+        }
+
+        awaitClose { subscription.remove() }
+    }
+
+    fun updateComplaint(complaint: Complaint): Flow<Result<Unit>> = callbackFlow {
+        val docRef = db.collection("complaints").document(complaint.id)
+        docRef.set(complaint)
+            .addOnSuccessListener {
+                trySend(Result.Success(Unit))
+            }
+            .addOnFailureListener { exception ->
+                trySend(Result.Error(exception.message ?: "Unknown error"))
+            }
+
+        awaitClose { }
+    }
 
 }

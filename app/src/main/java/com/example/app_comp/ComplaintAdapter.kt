@@ -22,6 +22,7 @@ class ComplaintAdapter(private var complaints: List<Complaint>) :
 //        }
         val textViewTitle: TextView = itemView.findViewById(R.id.complaint_title)
         val textViewDescription: TextView = itemView.findViewById(R.id.complaint_description)
+        val textViewStatus: TextView = itemView.findViewById(R.id.complaint_status)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ComplaintViewHolder {
@@ -33,7 +34,13 @@ class ComplaintAdapter(private var complaints: List<Complaint>) :
         val currentComplaint = complaints[position]
         //holder.bind(currentComplaint)
         holder.textViewTitle.text = currentComplaint.title
-        holder.textViewDescription.text = currentComplaint.description
+        //holder.textViewDescription.text = currentComplaint.description
+        holder.textViewDescription.text = currentComplaint.date.toString()
+        holder.itemView.setOnClickListener {
+
+        }
+
+        //holder.textViewStatus.text = currentComplaint.status
     }
 
     override fun getItemCount() = complaints.size
@@ -41,9 +48,5 @@ class ComplaintAdapter(private var complaints: List<Complaint>) :
     fun setComplaints(complaints: List<Complaint>) {
         this.complaints = complaints
         notifyDataSetChanged()
-    }
-
-    class OnClickListener(val clickListener: (complaint: Complaint) -> Unit) {
-        fun onClick(complaint: Complaint) = clickListener(complaint)
     }
 }

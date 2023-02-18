@@ -26,4 +26,7 @@ class UserViewModel : ViewModel()  {
         return result
     }
 
+    fun updateComplaint(complaint: Complaint): Flow<Result<Unit>> = repo.updateComplaint(complaint)
+
+    fun getComplaintById(id: String): Flow<Result<Complaint>> = repo.getComplaintById(id)
 }
