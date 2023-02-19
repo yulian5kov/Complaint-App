@@ -15,3 +15,5 @@ const val DEBUGGING = "debugging"
 const val REQUEST_CODE_IMAGE_PICK = 1
 
 const val REQUEST_LOCATION_PERMISSION = 1
+
+const val REQUEST_CODE_IMAGE_PICKER = 1

@@ -7,25 +7,23 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.app_comp.databinding.FragmentPostComplaintBinding
 import com.google.android.gms.location.*
 import kotlinx.coroutines.flow.first
@@ -38,14 +36,32 @@ class PostComplaintFragment : Fragment(){
     private lateinit var binding: FragmentPostComplaintBinding
     private val viewModel: UserViewModel by viewModels()
     private var images: MutableList<Uri> = mutableListOf()
-
     private lateinit var imageAdapter: ImageAdapter
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var locationRequest: LocationRequest
 
 
-    private val REQUEST_CODE_IMAGE_PICKER = 1
-    private lateinit var imageUri: Uri
     private fun MutableList<Uri>.toStringList(): List<String> {
         return this.map { it.toString() }
+    }
+
+    private fun getAddress(latitude: Double, longitude: Double): String {
+        val geocoder = Geocoder(requireContext())
+        val addresses = geocoder.getFromLocation(latitude, longitude, 1)
+        return if (addresses.isNotEmpty()) {
+            val address = addresses[0]
+            "${address.thoroughfare}, ${address.locality}, ${address.countryName}"
+        } else {
+            "Unknown address"
+        }
+    }
+
+    private fun createLocationRequest() {
+        locationRequest = LocationRequest.create().apply {
+            interval = 10000 // 10 seconds
+            fastestInterval = 5000 // 5 seconds
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -116,15 +132,36 @@ class PostComplaintFragment : Fragment(){
         }
     }
 
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         try {
             // Inflate the layout for this fragment
             binding = FragmentPostComplaintBinding.inflate(inflater, container, false)
-
             (activity as UserActivity).setButtonInvisible()
 
+            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+            createLocationRequest()
 
+            binding.btnAddLocation.setOnClickListener {
+                if (ActivityCompat.checkSelfPermission(
+                        requireContext(),
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                        requireContext(),
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    // TODO: Consider calling ActivityCompat#requestPermissions here to request the missing permissions
+                    return@setOnClickListener
+                }
+                fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
+                    if (location != null) {
+                        val latitude = location.latitude
+                        val longitude = location.longitude
+                        val address = getAddress(latitude, longitude)
+                        binding.tvLocation.text = "$address"
+                    }
+                }
+            }
 
             return binding.root
         } catch (e: Exception) {
@@ -136,6 +173,7 @@ class PostComplaintFragment : Fragment(){
     override fun onCreate(savedInstanceState: Bundle?) {
         try {
             super.onCreate(savedInstanceState)
+
         } catch (e: Exception) {
             Log.e(DEBUGGING, "pcf: Error in onCreate: ${e.message}")
         }
@@ -160,25 +198,6 @@ class PostComplaintFragment : Fragment(){
         binding.rvImages.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.rvImages.adapter = imageAdapter
         //
-
-        binding.btnAddLocation.setOnClickListener {
-            if (ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    requireActivity(),
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    REQUEST_LOCATION_PERMISSION
-                )
-            } else {
-                getLocation()
-            }
-        }
 
         binding.btnAddImage.setOnClickListener {
             val intent = Intent().apply {
@@ -242,47 +261,6 @@ class PostComplaintFragment : Fragment(){
 
     override fun onDestroy() {
         super.onDestroy()
-    }
-
-    private fun getLocation() {
-        val locationManager =
-            requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-
-        if (!isGpsEnabled && !isNetworkEnabled) {
-            // Neither GPS nor network location providers are available
-            // Show error message to user
-            return
-        }
-
-        var location: Location? = null
-
-        if (isNetworkEnabled) {
-            if (ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-            }
-        }
-
-        if (isGpsEnabled) {
-            if (location == null && ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            }
-        }
-
-        location?.let {
-            binding.tvLocation.text = "Lat: ${it.latitude}, Lon: ${it.longitude}"
-        } ?: run {
-            Log.d(DEBUGGING, "location is null")
-        }
     }
 
 }
