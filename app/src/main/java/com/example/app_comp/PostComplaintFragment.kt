@@ -158,6 +158,7 @@ class PostComplaintFragment : Fragment(){
                         val latitude = location.latitude
                         val longitude = location.longitude
                         val address = getAddress(latitude, longitude)
+                        Log.d(DEBUGGING, "jizz $address")
                         binding.tvLocation.text = "$address"
                     }
                 }
@@ -247,6 +248,7 @@ class PostComplaintFragment : Fragment(){
 
     override fun onResume() {
         super.onResume()
+        (activity as UserActivity).setButtonInvisible()
         requireActivity().onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 requireFragmentManager().popBackStack()

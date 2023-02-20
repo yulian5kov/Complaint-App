@@ -50,6 +50,7 @@ class UserActivity : AppCompatActivity(), ViewComplaintFragment.ButtonVisibility
 
         binding.btnViewComplaints.setOnClickListener {
             binding.btnLogout.visibility = View.GONE
+            Log.d(DEBUGGING, "pishle")
             replaceFragment(ViewComplaintFragment())
         }
     }

@@ -50,6 +50,26 @@ class ViewComplaintFragment : Fragment(){
         }
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        // Set up the RecyclerView
+        complaintAdapter = ComplaintAdapter(complaints)
+
+        complaintAdapter.setOnItemClickCallback { complaint ->
+            // Handle item click here
+            showToast(complaint.title)
+            replaceFragment(EditComplaintFragment())
+        }
+
+        binding.recyclerViewComplaints.adapter = complaintAdapter
+        binding.recyclerViewComplaints.layoutManager = LinearLayoutManager(context)
+
+        // Call the API to retrieve the complaint data
+        bindViewModel(viewModel)
+
+    }
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -81,18 +101,23 @@ class ViewComplaintFragment : Fragment(){
                     is Result.Success -> {
                         Log.d(DEBUGGING, "Complaints fetched successfully")
 
-                        if(config.userRole == ADMIN_ROLE){
-                            // Do something with the fetched complaints
-                            val complaintAdapter = ComplaintAdapter(result.data)
-                            //val complaintAdapter = ComplaintAdapter(filteredComplaints)
-                            binding.recyclerViewComplaints.adapter = complaintAdapter
-                        }else if (config.userRole == USER_ROLE){
-                            // Do something with the fetched complaints
-                            val filteredComplaints = result.data.filter { it.userId == config.userId }
-                            //val complaintAdapter = ComplaintAdapter(result.data)
-                            val complaintAdapter = ComplaintAdapter(filteredComplaints)
-                            binding.recyclerViewComplaints.adapter = complaintAdapter
-                        }
+//                        if(config.userRole == ADMIN_ROLE){
+//                            // Do something with the fetched complaints
+//                            val complaintAdapter = ComplaintAdapter(result.data)
+//                            //val complaintAdapter = ComplaintAdapter(filteredComplaints)
+//                            binding.recyclerViewComplaints.adapter = complaintAdapter
+//                        }else if (config.userRole == USER_ROLE){
+//                            // Do something with the fetched complaints
+//                            val filteredComplaints = result.data.filter { it.userId == config.userId }
+//                            //val complaintAdapter = ComplaintAdapter(result.data)
+//                            val complaintAdapter = ComplaintAdapter(filteredComplaints)
+//                            binding.recyclerViewComplaints.adapter = complaintAdapter
+//                        }
+
+                        // Update the RecyclerView adapter with the fetched complaints
+                        val filteredComplaints = result.data.filter { it.userId == config.userId }
+                        complaintAdapter.setComplaints(filteredComplaints)
+
                     }
                     is Result.Error -> {
                         Log.d(DEBUGGING, "Error fetching complaints: ${result.exception}")
@@ -113,6 +138,7 @@ class ViewComplaintFragment : Fragment(){
 
     override fun onResume() {
         super.onResume()
+        (activity as UserActivity).setButtonInvisible()
         requireActivity().onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 requireFragmentManager().popBackStack()
