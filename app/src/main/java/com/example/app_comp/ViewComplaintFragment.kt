@@ -57,12 +57,8 @@ class ViewComplaintFragment : Fragment(){
         try {
             // Inflate the layout for this fragment
             binding = FragmentViewComplaintBinding.inflate(inflater, container, false)
-            //(activity as UserActivity).setButtonInvisible()
-
-
 
             // Set up the RecyclerView
-
             complaintAdapter = ComplaintAdapter(complaints)
             binding.recyclerViewComplaints.adapter = complaintAdapter
             binding.recyclerViewComplaints.layoutManager = LinearLayoutManager(context)
@@ -126,25 +122,7 @@ class ViewComplaintFragment : Fragment(){
 
     override fun onPause() {
         super.onPause()
-        //(activity as UserActivity).setButtonVisible()
-        //(activity as AdminActivity).setButtonVisible()
         buttonListener?.setButtonVisible()
     }
-
-//    companion object {
-//        fun newInstance(complaint: Complaint): EditComplaintFragment {
-//            val args = Bundle()
-//            args.putParcelable("complaint", complaint)
-//            val fragment = EditComplaintFragment()
-//            fragment.arguments = args
-//            return fragment
-//        }
-//    }
-//
-//    override fun onComplaintItemClicked(complaint: Complaint) {
-//        val editComplaintFragment = EditComplaintFragment.newInstance(complaint)
-//        requireActivity().replaceFragment(editComplaintFragment)
-//    }
-
 
 }

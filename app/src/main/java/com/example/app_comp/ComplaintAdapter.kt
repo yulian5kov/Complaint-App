@@ -6,20 +6,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-//private val onClickListener: OnClickListener
 class ComplaintAdapter(private var complaints: List<Complaint>) :
     RecyclerView.Adapter<ComplaintAdapter.ComplaintViewHolder>() {
 
-    //private var complaints = emptyList<Complaint>()
-
     inner class ComplaintViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-//        fun bind(complaint: Complaint) {
-//            itemView.title_text.text = complaint.title
-//            itemView.description_text.text = complaint.description
-//            itemView.setOnClickListener {
-//                onClickListener.onClick(complaint)
-//            }
-//        }
         val textViewTitle: TextView = itemView.findViewById(R.id.complaint_title)
         val textViewDescription: TextView = itemView.findViewById(R.id.complaint_description)
         val textViewStatus: TextView = itemView.findViewById(R.id.complaint_status)
@@ -32,15 +22,12 @@ class ComplaintAdapter(private var complaints: List<Complaint>) :
 
     override fun onBindViewHolder(holder: ComplaintViewHolder, position: Int) {
         val currentComplaint = complaints[position]
-        //holder.bind(currentComplaint)
         holder.textViewTitle.text = currentComplaint.title
-        //holder.textViewDescription.text = currentComplaint.description
         holder.textViewDescription.text = currentComplaint.date.toString()
+        holder.textViewStatus.text = currentComplaint.status
         holder.itemView.setOnClickListener {
 
         }
-
-        //holder.textViewStatus.text = currentComplaint.status
     }
 
     override fun getItemCount() = complaints.size

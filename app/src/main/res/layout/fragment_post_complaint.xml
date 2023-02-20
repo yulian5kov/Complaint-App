@@ -46,11 +46,11 @@
 
                 <TextView
                     android:id="@+id/tvLocation"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="none"
+                    android:layout_width="278dp"
+                    android:layout_height="34dp"
+                    android:clickable="false"
                     android:focusable="false"
-                    android:clickable="false"/>
+                    android:inputType="none" />
 
             </LinearLayout>
 
