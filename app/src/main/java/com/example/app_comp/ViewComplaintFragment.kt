@@ -57,8 +57,9 @@ class ViewComplaintFragment : Fragment(){
 
         complaintAdapter.setOnItemClickCallback { complaint ->
             // Handle item click here
+            Log.d(DEBUGGING, "garjoka")
             showToast(complaint.title)
-            replaceFragment(EditComplaintFragment())
+            //replaceFragment(EditComplaintFragment())
         }
 
         binding.recyclerViewComplaints.adapter = complaintAdapter
@@ -101,22 +102,23 @@ class ViewComplaintFragment : Fragment(){
                     is Result.Success -> {
                         Log.d(DEBUGGING, "Complaints fetched successfully")
 
-//                        if(config.userRole == ADMIN_ROLE){
-//                            // Do something with the fetched complaints
-//                            val complaintAdapter = ComplaintAdapter(result.data)
-//                            //val complaintAdapter = ComplaintAdapter(filteredComplaints)
-//                            binding.recyclerViewComplaints.adapter = complaintAdapter
-//                        }else if (config.userRole == USER_ROLE){
-//                            // Do something with the fetched complaints
-//                            val filteredComplaints = result.data.filter { it.userId == config.userId }
-//                            //val complaintAdapter = ComplaintAdapter(result.data)
-//                            val complaintAdapter = ComplaintAdapter(filteredComplaints)
-//                            binding.recyclerViewComplaints.adapter = complaintAdapter
-//                        }
+                        if(config.userRole == ADMIN_ROLE){
+                            // Do something with the fetched complaints
+                            val complaintAdapter = ComplaintAdapter(result.data, isAdmin = true)
+                            //val complaintAdapter = ComplaintAdapter(filteredComplaints)
+
+                            binding.recyclerViewComplaints.adapter = complaintAdapter
+                        }else if (config.userRole == USER_ROLE){
+                            // Do something with the fetched complaints
+                            val filteredComplaints = result.data.filter { it.userId == config.userId }
+                            //val complaintAdapter = ComplaintAdapter(result.data)
+                            val complaintAdapter = ComplaintAdapter(filteredComplaints)
+                            binding.recyclerViewComplaints.adapter = complaintAdapter
+                        }
 
                         // Update the RecyclerView adapter with the fetched complaints
-                        val filteredComplaints = result.data.filter { it.userId == config.userId }
-                        complaintAdapter.setComplaints(filteredComplaints)
+//                        val filteredComplaints = result.data.filter { it.userId == config.userId }
+//                        complaintAdapter.setComplaints(filteredComplaints)
 
                     }
                     is Result.Error -> {
@@ -138,9 +140,16 @@ class ViewComplaintFragment : Fragment(){
 
     override fun onResume() {
         super.onResume()
-        (activity as UserActivity).setButtonInvisible()
+        //(activity as AdminActivity).setButtonInvisible()
+        activity?.let {
+            if (it is UserActivity || it is AdminActivity) {
+                (it as ButtonVisibilityListener).setButtonInvisible()
+            }
+        }
+
         requireActivity().onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+
                 requireFragmentManager().popBackStack()
             }
         })

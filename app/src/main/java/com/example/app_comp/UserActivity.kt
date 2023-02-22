@@ -50,7 +50,6 @@ class UserActivity : AppCompatActivity(), ViewComplaintFragment.ButtonVisibility
 
         binding.btnViewComplaints.setOnClickListener {
             binding.btnLogout.visibility = View.GONE
-            Log.d(DEBUGGING, "pishle")
             replaceFragment(ViewComplaintFragment())
         }
     }
@@ -61,6 +60,7 @@ class UserActivity : AppCompatActivity(), ViewComplaintFragment.ButtonVisibility
             supportFragmentManager.popBackStack()
         } else {
             super.onBackPressed()
+            finish() // add this line to close the application
         }
     }
 

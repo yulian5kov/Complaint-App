@@ -18,9 +18,7 @@ class LoginActivity : AppCompatActivity() {
         init()
     }
     private fun init(){
-//        Log.d(DEBUGGING, "swag" + config.isLoggedIn.toString())
         if (config.isLoggedIn) {
-//            Log.d(DEBUGGING, "hui")
             if(config.userRole == USER_ROLE){
                 startActivity(Intent(this, UserActivity::class.java))
                 finish()
@@ -34,5 +32,6 @@ class LoginActivity : AppCompatActivity() {
             replaceFragment(LoginFragment())
         }
     }
+
 
 }

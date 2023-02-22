@@ -98,14 +98,6 @@ class LoginFragment : Fragment() {
         return true
     }
 
-//    override fun onAttach(context: Context) {
-//        if(isAdded){
-//            super.onAttach(context)
-//        }else{
-//            Log.i(DEBUGGING, "not attached")
-//        }
-//    }
-
 
 }
 

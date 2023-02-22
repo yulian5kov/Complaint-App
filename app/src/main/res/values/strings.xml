@@ -10,4 +10,10 @@
     <string name="complaints">Complaints</string>
     <string name="user_add_failure">Error adding user</string>
     <string name="user_login_failure">Error Logging in user</string>
+    <array name="complaint_status">
+        <item>New</item>
+        <item>In Progress</item>
+        <item>Resolved</item>
+        <item>Cancelled</item>
+    </array>
 </resources>

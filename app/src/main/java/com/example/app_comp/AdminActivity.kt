@@ -46,6 +46,7 @@ class AdminActivity : AppCompatActivity(), ViewComplaintFragment.ButtonVisibilit
             supportFragmentManager.popBackStack()
         } else {
             super.onBackPressed()
+            finish() // add this line to close the application
         }
     }
 

@@ -43,7 +43,7 @@ class FirestoreRepository {
                                 val user = it.toObject(User::class.java)
                                 trySend(Result.Success(user!!)).isSuccess
                             }else{
-                                trySend(Result.Failed("User not found", "swag")).isSuccess
+                                trySend(Result.Failed("User not found", "user not found")).isSuccess
                             }
                         }
                         .addOnFailureListener {

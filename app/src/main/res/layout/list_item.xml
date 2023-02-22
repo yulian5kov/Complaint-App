@@ -22,7 +22,7 @@
         android:padding="16dp"
         android:text="Complaint Description" />
 
-    <TextView
+    <EditText
         android:id="@+id/complaint_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

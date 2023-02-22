@@ -10,7 +10,7 @@ data class Complaint(
     var userId: String = "",
     var title: String = "",
     var description: String = "",
-    val images: List<String> = emptyList(),
+    var images: List<String> = emptyList(),
     var date: Timestamp = Timestamp.now(),
     var location: String = "",
     var status: String = "Pending"

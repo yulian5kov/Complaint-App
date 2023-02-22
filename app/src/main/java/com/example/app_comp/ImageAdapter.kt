@@ -36,6 +36,16 @@ class ImageAdapter(private val context: Context) :
         notifyItemInserted(images.size - 1)
     }
 
+    fun getImages(): List<String> {
+        val paths = mutableListOf<String>()
+        for (imageUri in images) {
+            paths.add(imageUri.toString())
+        }
+        return paths
+    }
+
+
+
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val ivImage: ImageView = itemView.findViewById(R.id.image_view)
 
