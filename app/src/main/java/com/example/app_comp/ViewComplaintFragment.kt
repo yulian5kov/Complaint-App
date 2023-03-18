@@ -22,7 +22,7 @@ class ViewComplaintFragment : Fragment(){
 
     private lateinit var binding: FragmentViewComplaintBinding
     private lateinit var complaintAdapter: ComplaintAdapter
-    private val  viewModel: UserViewModel by viewModels()
+    private val viewModel: UserViewModel by viewModels()
     private var complaints = emptyList<Complaint>()
     private var buttonListener: ButtonVisibilityListener? = null
 
@@ -57,7 +57,6 @@ class ViewComplaintFragment : Fragment(){
 
         complaintAdapter.setOnItemClickCallback { complaint ->
             // Handle item click here
-            Log.d(DEBUGGING, "garjoka")
             showToast(complaint.title)
             //replaceFragment(EditComplaintFragment())
         }

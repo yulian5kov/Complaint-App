@@ -158,7 +158,7 @@ class PostComplaintFragment : Fragment(){
                         val latitude = location.latitude
                         val longitude = location.longitude
                         val address = getAddress(latitude, longitude)
-                        Log.d(DEBUGGING, "jizz $address")
+                        Log.d(DEBUGGING, "$address")
                         binding.tvLocation.text = "$address"
                     }
                 }
@@ -259,10 +259,6 @@ class PostComplaintFragment : Fragment(){
     override fun onPause() {
         super.onPause()
         (activity as UserActivity).setButtonVisible()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 
 }
