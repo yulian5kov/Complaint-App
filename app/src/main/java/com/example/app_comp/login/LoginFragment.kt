@@ -51,12 +51,12 @@ class LoginFragment : Fragment() {
 
         viewModel.loginUser(email, password)
             .onStart {
-                showProgress()
+//                showProgress()
             }
             .onEach { result ->
                 when (result) {
                     is Result.Success<User> -> {
-                        hideProgress()
+//                        hideProgress()
                         val user = result.data
                         config.userId = mAuth.currentUser!!.uid
                         config.userName = user.name
@@ -70,11 +70,11 @@ class LoginFragment : Fragment() {
                         }
                     }
                     is Result.Error -> {
-                        hideProgress()
+//                        hideProgress()
                         showToast("Login failed: ${result.exception}")
                     }
                     else -> {
-                        hideProgress()
+//                        hideProgress()
                     }
                 }
             }

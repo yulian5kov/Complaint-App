@@ -45,6 +45,16 @@ class PostComplaintFragment : Fragment(){
         return this.map { it.toString() }
     }
 
+//    private val PLACE_PICKER_REQUEST = 1
+//    private val PLACE_PICKER_API_KEY = "YOUR_API_KEY" // Replace with your own API key
+//
+//    fun launchPlacePicker() {
+//        val builder = PlacePicker.IntentBuilder()
+//        builder.setLatLngBounds(LatLngBounds(LatLng(-33.880490, 151.184363), LatLng(-33.858754, 151.229596)))
+//        val intent = builder.build(this)
+//        startActivityForResult(intent, PLACE_PICKER_REQUEST)
+//    }
+
     private fun getAddress(latitude: Double, longitude: Double): String {
         val geocoder = Geocoder(requireContext())
         val addresses = geocoder.getFromLocation(latitude, longitude, 1)
@@ -238,7 +248,7 @@ class PostComplaintFragment : Fragment(){
                     }
                     is Result.Loading -> {
                         Log.d(DEBUGGING, "Loading posting complaint: ${result.isLoading}")
-                        showProgress()
+//                        showProgress()
                     }
                 }
             }

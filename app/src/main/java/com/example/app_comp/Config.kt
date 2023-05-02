@@ -28,7 +28,6 @@ class Config(context: Context) {
     var isLoggedIn: Boolean
         get() = prefs?.getBoolean(IS_LOGGED_IN, false)!!
         set(value){
-            Log.d("DEBUGGING", "kur isLoggedIn set to $value")
             prefs?.edit()?.putBoolean(IS_LOGGED_IN, value)?.apply()!!
         }
 

@@ -130,7 +130,7 @@ class ViewComplaintFragment : Fragment(){
                     }
                     is Result.Loading -> {
                         Log.d(DEBUGGING, "Loading fetching complaints: ${result.isLoading}")
-                        showProgress()
+//                        showProgress()
                     }
                 }
             }

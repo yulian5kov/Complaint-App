@@ -44,7 +44,7 @@ class EditComplaintFragment : Fragment() {
             viewModel.getComplaintById(complaintId).collect { result ->
                 when (result) {
                     is Result.Success -> {
-                        hideProgress()
+//                        hideProgress()
                         complaint = result.data
 
                         // Display the complaint information
@@ -85,7 +85,7 @@ class EditComplaintFragment : Fragment() {
                         showToast("Failed to update complaint: ${result.error} + ${result.message}")
                     }
                     is Result.Loading -> {
-                        showProgress()
+//                        showProgress()
                     }
                 }
             }

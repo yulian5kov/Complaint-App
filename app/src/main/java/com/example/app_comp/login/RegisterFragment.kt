@@ -37,13 +37,13 @@ class RegisterFragment : Fragment() {
                 }
 
                 val user = User(name = name, email = email, user_role = USER_ROLE)
-                showProgress()
+//                showProgress()
 
                 viewModel.addUser(user, password)
                     .onEach { result ->
                         when (result) {
                             is Result.Success -> {
-                                hideProgress()
+//                                hideProgress()
                                 showToast("User successfully registered")
 
                                 config.userId = mAuth.currentUser!!.uid
@@ -56,15 +56,15 @@ class RegisterFragment : Fragment() {
                                 requireActivity().finish()
                             }
                             is Result.Error -> {
-                                hideProgress()
+//                                hideProgress()
                                 showToast(result.exception)
                             }
                             is Result.Failed -> {
-                                hideProgress()
+//                                hideProgress()
                                 showToast("${result.message} + ${result.error}")
                             }
                             is Result.Loading -> {
-                                showProgress()
+//                                showProgress()
                             }
                         }
                     }
