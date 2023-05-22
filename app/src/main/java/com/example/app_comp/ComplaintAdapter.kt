@@ -17,6 +17,9 @@ import java.util.Locale
 class ComplaintAdapter(private var complaints: List<Complaint>, private val activity: FragmentActivity) :
     RecyclerView.Adapter<ComplaintAdapter.ComplaintViewHolder>() {
 
+    //class ComplaintAdapter(private var complaints: List<Complaint>, private val listener: OnItemClickListener)
+    // : RecyclerView.Adapter<ComplaintAdapter.ViewHolder>() {
+
     interface OnItemClickListener {
         fun onItemClick(complaint: Complaint)
     }

@@ -86,7 +86,6 @@ class ComplaintDetailsFragment : Fragment() {
         binding.tvTitle.text = complaint.title
         binding.tvLocation.text = complaint.location
         binding.tvDesc.text = complaint.description
-        Log.d("pichka", complaint.images.toString())
         // Convert the list of image URLs to a list of Uri objects
         val imageUris = complaint.images.map { Uri.parse(it) }
 

@@ -6,6 +6,8 @@ import android.util.Log
 import android.view.View
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
+import android.widget.EditText
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -179,10 +181,6 @@ class UserActivity : AppCompatActivity(), ComplaintAdapter.OnItemClickListener {
                 binding.btnPost.visibility = View.INVISIBLE
                 complaintDetailsFragmentBBD.show()
             }
-            is MapFragment -> {
-                super.onBackPressed()
-                currentFragment = PostComplaintFragment()
-            }
             null -> {
                 super.onBackPressed()
                 endCurrentFragment()
@@ -216,15 +214,48 @@ class UserActivity : AppCompatActivity(), ComplaintAdapter.OnItemClickListener {
         currentFragment = null
     }
 
+    private fun showStatusViewDialog(complaint: Complaint) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_status_view, null)
+        val textViewStatus = dialogView.findViewById<TextView>(R.id.textViewStatus)
+
+        textViewStatus.text = complaint.status.toString()
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setNegativeButton("Close", null)
+            .create()
+
+        dialog.show()
+    }
+
+
     override fun onItemClick(complaint: Complaint) {
-        binding.btnPost.visibility = INVISIBLE
-        binding.rvComplaints.visibility = INVISIBLE
+
         val complaintId = complaint.id
-        val fragment = ComplaintDetailsFragment.newInstance(complaintId)
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.frame_layout, fragment)
-            .addToBackStack(null)
-            .commit()
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Choose Action")
+            .setMessage("Select an action for the complaint:")
+            .setPositiveButton("View Details") { _, _ ->
+                // Open ComplaintDetailsFragment
+                binding.btnPost.visibility = INVISIBLE
+                binding.rvComplaints.visibility = INVISIBLE
+
+                val fragment = ComplaintDetailsFragment.newInstance(complaintId)
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.frame_layout, fragment)
+                    .addToBackStack(null)
+                    .commit()
+            }
+            .setNegativeButton("View Status") { _, _ ->
+                // Show dialog for updating the status
+                showStatusViewDialog(complaint)
+            }
+            .create()
+
+        dialog.show()
+
+
     }
 
 }

@@ -2,16 +2,14 @@ package com.example.app_comp
 
 import android.Manifest
 import android.app.Activity
-import android.content.ActivityNotFoundException
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.location.Geocoder
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.provider.MediaStore.Audio.Media
 import android.provider.Settings
 import android.text.Editable
 import android.util.Log
@@ -19,33 +17,18 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.addCallback
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
-import androidx.core.content.PermissionChecker
-import androidx.core.content.PermissionChecker.checkSelfPermission
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import coil.transform.CircleCropTransformation
 import com.example.app_comp.data.Complaint
-import com.example.app_comp.data.FileData
-import com.example.app_comp.data.User
-import com.example.app_comp.databinding.FragmentLoginBinding
 import com.example.app_comp.databinding.FragmentPostComplaintBinding
-import com.example.app_comp.login.LoginActivity
-import com.example.app_comp.login.LoginViewModel
 import com.example.app_comp.utils.CAMERA_REQUEST_CODE
 import com.example.app_comp.utils.GALLERY_REQUEST_CODE
 import com.example.app_comp.utils.Result
-import com.example.app_comp.utils.SharedPreferencesManager
-import com.example.app_comp.utils.config
 import com.example.app_comp.utils.mAuth
 import com.example.app_comp.utils.showToast
-import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.location.LocationServices
 import com.google.firebase.Timestamp
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -62,6 +45,17 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
+import android.location.Location
+import androidx.core.content.ContextCompat
+import com.example.app_comp.utils.LOCATION_PERMISSION_REQUEST_CODE
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.FusedLocationProviderClient
+
+
+
+
 
 class PostComplaintFragment : Fragment() {
 
@@ -72,12 +66,13 @@ class PostComplaintFragment : Fragment() {
     private val imageUris: MutableList<Uri> = mutableListOf()
     private lateinit var imageAdapter: ImageAdapter
 
-    private lateinit var sharedPreferencesManager: SharedPreferencesManager
+
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private var currentLocation: String = ""
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         (activity as? UserActivity)?.setCurrentFragment(this)
-        sharedPreferencesManager = SharedPreferencesManager(requireContext())
     }
 
     override fun onResume() {
@@ -114,15 +109,47 @@ class PostComplaintFragment : Fragment() {
             photosDialog.show()
         }
 
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
+
         binding.btnLocation.setOnClickListener {
-            showToast(binding.etLocation.text.toString())
-            // Navigate to the MapFragment
-            val mapFragment = MapFragment()
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.map_frame_layout, mapFragment)
-                .addToBackStack(null)
-                .commit()
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                val locationRequest = LocationRequest.create()
+                    .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                    .setInterval(10000) // Interval in milliseconds to request location updates
+
+                val locationCallback = object : LocationCallback() {
+                    override fun onLocationResult(locationResult: LocationResult) {
+                        locationResult?.let {
+                            val location = it.lastLocation
+                            val geocoder = Geocoder(requireContext(), Locale.getDefault())
+                            val addresses = location?.let { it1 -> geocoder.getFromLocation(it1.latitude, location.longitude, 1) }
+                            if (addresses != null) {
+                                if (addresses.isNotEmpty()) {
+                                    currentLocation = (addresses?.get(0)?.getAddressLine(0) ?: Log.d("Location", "Current Location: $currentLocation")) as String
+                                    binding.etLocation.setText(currentLocation)
+                                } else {
+                                    Log.e("Location", "No addresses found")
+                                }
+                            }
+                            // Remove location updates after retrieving the location
+                            fusedLocationProviderClient.removeLocationUpdates(this)
+                        }
+                    }
+                }
+
+                fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null)
+            } else {
+                requestLocationPermission()
+            }
         }
+
+
+
+
         binding.btnSend.setOnClickListener{
             showToast("KUR")
             val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
@@ -133,8 +160,6 @@ class PostComplaintFragment : Fragment() {
 
             val title = binding.etTitle.text.toString()
             val description = binding.etDesc.text.toString()
-            val location = sharedPreferencesManager.location
-            binding.etLocation.text = Editable.Factory.getInstance().newEditable(location)
 
             if(title.isEmpty() || description.isEmpty() || images.isEmpty()){
                 showToast("The complaint won't be sent without title, description or images")
@@ -305,6 +330,32 @@ class PostComplaintFragment : Fragment() {
                 }
             })
             .check()
+    }
+
+    // LOCATION
+
+    private fun requestLocationPermission() {
+        requestPermissions(
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+            LOCATION_PERMISSION_REQUEST_CODE
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, retry the location retrieval
+                binding.btnLocation.performClick()
+            } else {
+                // Permission denied, show a message or handle it accordingly
+                showToast("Location permission denied")
+            }
+        }
     }
 
 }

@@ -4,10 +4,12 @@ import android.util.Log
 import com.example.app_comp.data.Complaint
 import com.example.app_comp.data.User
 import com.google.firebase.firestore.ktx.toObject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.tasks.await
 
 
@@ -110,6 +112,53 @@ class FirestoreRepository {
             awaitClose {
                 registration.remove()
                 Log.d(DEBUGGING, "Canceled get user complaints listener")
+            }
+        }
+    }
+
+    fun updateComplaintStatus(complaintId: String, newStatus: String): Flow<Result<Unit>> {
+        return callbackFlow {
+            val complaintRef = db.collection("complaints").document(complaintId)
+            val updates = mapOf("status" to newStatus)
+
+            val registration = complaintRef.update(updates).addOnSuccessListener {
+                trySend(Result.Success(Unit))
+            }.addOnFailureListener { exception ->
+                trySend(Result.Error(exception.toString()))
+            }
+
+            awaitClose {
+//                registration.remove()
+            }
+        }
+    }
+
+
+    fun getAllComplaints(): Flow<Result<List<Complaint>>> {
+        return callbackFlow {
+            val query = db.collection("complaints")
+
+            val registration = query.addSnapshotListener { querySnapshot, exception ->
+                if (exception != null) {
+                    trySend(Result.Error(exception.message ?: "Failed to retrieve complaints")).isSuccess
+                    return@addSnapshotListener
+                }
+
+                val complaints = mutableListOf<Complaint>()
+                if (querySnapshot != null) {
+                    for (document in querySnapshot) {
+                        val complaint = document.toObject(Complaint::class.java)
+                        complaints.add(complaint)
+                    }
+                }
+
+                trySend(Result.Success(complaints)).isSuccess
+                Log.d(DEBUGGING, "Received all complaints update")
+            }
+
+            awaitClose {
+                registration.remove()
+                Log.d(DEBUGGING, "Canceled get all complaints listener")
             }
         }
     }
