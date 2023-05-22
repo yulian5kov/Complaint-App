@@ -3,9 +3,12 @@ package com.example.app_comp.login
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import androidx.fragment.app.FragmentManager
 import com.example.app_comp.*
 import com.example.app_comp.databinding.ActivityLoginBinding
+import com.example.app_comp.utils.ADMIN_ROLE
+import com.example.app_comp.utils.USER_ROLE
+import com.example.app_comp.utils.config
 
 class LoginActivity : AppCompatActivity() {
 
@@ -31,13 +34,8 @@ class LoginActivity : AppCompatActivity() {
                 finish()
             }
         } else {
-//            replaceFragment(LoginFragment())
             supportFragmentManager.beginTransaction().apply{
-                // starts LoginFragment into FrameLayout of which is inside of LoginActivity
                 replace(R.id.frame_layout, LoginFragment())
-                // adds the fragment to the backstack so it closes when back btn is pressed
-                // null refers to a name that can be given to this transaction
-//                addToBackStack(null)
                 commit()
             }
         }

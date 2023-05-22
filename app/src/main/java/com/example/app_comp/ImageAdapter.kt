@@ -1,56 +1,60 @@
 package com.example.app_comp
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.ImageView
+import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.app_comp.data.FileData
+import com.example.app_comp.databinding.ItemFileBinding
+import com.example.app_comp.databinding.ItemImageBinding
 
-class ImageAdapter(private val context: Context) :
-    RecyclerView.Adapter<ImageAdapter.ViewHolder>() {
+class ImageAdapter(private val context: Context, private val imageUris: List<Uri>) : RecyclerView.Adapter<ImageAdapter.ImageViewHolder>() {
 
-    private val images = mutableListOf<Uri>()
+    inner class ImageViewHolder(private val binding: ItemImageBinding) :
+        RecyclerView.ViewHolder(binding.root), View.OnClickListener  {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(context).inflate(R.layout.image_item, parent, false)
-        return ViewHolder(view)
+        init {
+            binding.imageView.setOnClickListener(this)
+        }
+
+        fun bind(imageUri: Uri) {
+            Glide.with(context)
+                .load(imageUri)
+                .into(binding.imageView)
+        }
+
+        override fun onClick(view: View?) {
+            val position = bindingAdapterPosition
+            if (position != RecyclerView.NO_POSITION) {
+                val imageUri = imageUris[position]
+                val fullscreenFragment = ImageFullscreenFragment.newInstance(imageUri)
+                val fragmentManager = (context as FragmentActivity).supportFragmentManager
+                val transaction = fragmentManager.beginTransaction()
+                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                transaction.add(android.R.id.content, fullscreenFragment)
+                transaction.addToBackStack(null)
+                transaction.commit()
+            }
+        }
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val imageUri = images[position]
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
+        val layoutInflater = LayoutInflater.from(parent.context)
+        val binding = ItemImageBinding.inflate(layoutInflater, parent, false)
+        return ImageViewHolder(binding)
+    }
+
+    override fun getItemCount(): Int = imageUris.size
+
+    override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
+        val imageUri = imageUris[position]
         holder.bind(imageUri)
     }
 
-    override fun getItemCount(): Int {
-        return images.size
-    }
-
-    fun addImage(imageUri: Uri) {
-        images.add(imageUri)
-        notifyItemInserted(images.size - 1)
-    }
-
-    fun getImages(): List<String> {
-        val paths = mutableListOf<String>()
-        for (imageUri in images) {
-            paths.add(imageUri.toString())
-        }
-        return paths
-    }
-
-
-
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val ivImage: ImageView = itemView.findViewById(R.id.image_view)
-
-        fun bind(imageUri: Uri) {
-            Glide.with(itemView).load(imageUri).into(ivImage)
-        }
-    }
 }
+

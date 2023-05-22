@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/post_complaint_fragment_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
-    <EditText
-        android:id="@+id/etTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter title here"
-        android:padding="16dp"/>
+<!--    android:background="@android:color/holo_blue_dark"-->
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/etTitle">
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:padding="16dp"
+        tools:context=".PostComplaintFragment">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -21,66 +22,98 @@
             android:orientation="vertical">
 
             <EditText
-                android:id="@+id/etDescription"
+                android:id="@+id/et_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Enter description here"
-                android:padding="16dp"/>
+                android:hint="Enter title"
+                android:maxLines="1" />
 
-            <Button
-                android:id="@+id/btnAddImage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Add Image"/>
+            <EditText
+                android:id="@+id/et_desc"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:hint="Enter description" />
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <Button
-                    android:id="@+id/btnAddLocation"
+                <EditText
+                    android:id="@+id/et_location"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:hint="press on the location button to get your location here"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/btn_location"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageButton
+                    android:id="@+id/btn_location"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Add Location"/>
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/circular_button_background"
+                    android:contentDescription="location"
+                    android:src="@drawable/ic_location"
+                    app:layout_constraintBottom_toBottomOf="@id/et_location"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/et_location" />
 
-                <TextView
-                    android:id="@+id/tvLocation"
-                    android:layout_width="278dp"
-                    android:layout_height="34dp"
-                    android:clickable="false"
-                    android:focusable="false"
-                    android:inputType="none" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/btnPostComplaint"
+            <FrameLayout
+                android:id="@+id/map_frame_layout"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Post Complaint"/>
-
-            <TextView
-                android:id="@+id/tvImagesLabel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:text="Images"
-                android:textSize="18sp"/>
+                android:layout_height="wrap_content" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvImages"
+                android:id="@+id/rv_images"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="16dp"
-                android:padding="4dp"
-                android:nestedScrollingEnabled="false"
-                android:scrollbars="none"
-                android:visibility="visible"/>
+                android:orientation="vertical"/>
 
         </LinearLayout>
+
     </ScrollView>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/btn_photos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/holo_orange_light"
+            android:text="Add photos"
+            android:textSize="18sp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="16dp"/>
+
+        <Button
+            android:id="@+id/btn_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:backgroundTint="@android:color/holo_orange_light"
+            android:text="Send complaint"
+            android:textSize="18sp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="16dp"/>
+
+    </LinearLayout>
+
+
 
 </RelativeLayout>

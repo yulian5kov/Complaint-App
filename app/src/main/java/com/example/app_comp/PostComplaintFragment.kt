@@ -2,274 +2,309 @@ package com.example.app_comp
 
 import android.Manifest
 import android.app.Activity
-import android.app.Activity.RESULT_OK
-import android.content.Context
+import android.content.ActivityNotFoundException
+import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.location.Geocoder
-import android.location.Location
-import android.location.LocationManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.os.Looper
 import android.provider.MediaStore
+import android.provider.MediaStore.Audio.Media
+import android.provider.Settings
+import android.text.Editable
 import android.util.Log
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
+import androidx.activity.addCallback
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
+import androidx.core.content.PermissionChecker
+import androidx.core.content.PermissionChecker.checkSelfPermission
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import coil.transform.CircleCropTransformation
+import com.example.app_comp.data.Complaint
+import com.example.app_comp.data.FileData
+import com.example.app_comp.data.User
+import com.example.app_comp.databinding.FragmentLoginBinding
 import com.example.app_comp.databinding.FragmentPostComplaintBinding
-import com.google.android.gms.location.*
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import java.io.ByteArrayOutputStream
-import java.util.*
+import com.example.app_comp.login.LoginActivity
+import com.example.app_comp.login.LoginViewModel
+import com.example.app_comp.utils.CAMERA_REQUEST_CODE
+import com.example.app_comp.utils.GALLERY_REQUEST_CODE
+import com.example.app_comp.utils.Result
+import com.example.app_comp.utils.SharedPreferencesManager
+import com.example.app_comp.utils.config
+import com.example.app_comp.utils.mAuth
+import com.example.app_comp.utils.showToast
+import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.Timestamp
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionDeniedResponse
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import com.karumi.dexter.listener.single.PermissionListener
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.UUID
 
+class PostComplaintFragment : Fragment() {
 
-class PostComplaintFragment : Fragment(){
     private lateinit var binding: FragmentPostComplaintBinding
     private val viewModel: UserViewModel by viewModels()
-    private var images: MutableList<Uri> = mutableListOf()
+    private lateinit var photosDialog: AlertDialog
+    // Declare a list to hold the image URIs
+    private val imageUris: MutableList<Uri> = mutableListOf()
     private lateinit var imageAdapter: ImageAdapter
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private lateinit var locationRequest: LocationRequest
 
+    private lateinit var sharedPreferencesManager: SharedPreferencesManager
 
-    private fun MutableList<Uri>.toStringList(): List<String> {
-        return this.map { it.toString() }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        (activity as? UserActivity)?.setCurrentFragment(this)
+        sharedPreferencesManager = SharedPreferencesManager(requireContext())
     }
 
-//    private val PLACE_PICKER_REQUEST = 1
-//    private val PLACE_PICKER_API_KEY = "YOUR_API_KEY" // Replace with your own API key
-//
-//    fun launchPlacePicker() {
-//        val builder = PlacePicker.IntentBuilder()
-//        builder.setLatLngBounds(LatLngBounds(LatLng(-33.880490, 151.184363), LatLng(-33.858754, 151.229596)))
-//        val intent = builder.build(this)
-//        startActivityForResult(intent, PLACE_PICKER_REQUEST)
-//    }
-
-    private fun getAddress(latitude: Double, longitude: Double): String {
-        val geocoder = Geocoder(requireContext())
-        val addresses = geocoder.getFromLocation(latitude, longitude, 1)
-        return if (addresses.isNotEmpty()) {
-            val address = addresses[0]
-            "${address.thoroughfare}, ${address.locality}, ${address.countryName}"
-        } else {
-            "Unknown address"
-        }
+    override fun onResume() {
+        (activity as? UserActivity)?.setCurrentFragment(this)
+        super.onResume()
     }
 
-    private fun createLocationRequest() {
-        locationRequest = LocationRequest.create().apply {
-            interval = 10000 // 10 seconds
-            fastestInterval = 5000 // 5 seconds
-            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentPostComplaintBinding.inflate(layoutInflater)
+
+        photosDialog = AlertDialog.Builder(requireContext())
+            .setTitle("Which one")
+            .setMessage("Take a photo or pick from existing")
+            .setIcon(R.drawable.ic_question_foreground)
+            .setPositiveButton("Camera"){ _,_ ->
+                cameraCheckPermission()
+            }
+            .setNegativeButton("Gallery"){ _,_ ->
+                galleryCheckPermission()
+            }.create()
+
+        // Create an instance of your custom ImageAdapter
+        imageAdapter = ImageAdapter(requireContext(), imageUris)
+
+        // Set the adapter for the RecyclerView
+        binding.rvImages.adapter = imageAdapter
+        binding.rvImages.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+
+        binding.btnPhotos.setOnClickListener {
+            Log.d("photos", imageUris.toString())
+            photosDialog.show()
         }
+
+        binding.btnLocation.setOnClickListener {
+            showToast(binding.etLocation.text.toString())
+            // Navigate to the MapFragment
+            val mapFragment = MapFragment()
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.map_frame_layout, mapFragment)
+                .addToBackStack(null)
+                .commit()
+        }
+        binding.btnSend.setOnClickListener{
+            showToast("KUR")
+            val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
+            val date = Date()
+            val dateString = dateFormat.format(date)
+            val timestamp = Timestamp(date)
+            val images =  imageUris.map { it.toString() }
+
+            val title = binding.etTitle.text.toString()
+            val description = binding.etDesc.text.toString()
+            val location = sharedPreferencesManager.location
+            binding.etLocation.text = Editable.Factory.getInstance().newEditable(location)
+
+            if(title.isEmpty() || description.isEmpty() || images.isEmpty()){
+                showToast("The complaint won't be sent without title, description or images")
+                return@setOnClickListener
+            }
+
+            val complaint = Complaint(
+                id = "",
+                userId = mAuth.currentUser!!.uid,
+                title = title,
+                description = description,
+                images = images,
+                date = timestamp,
+                location = binding.etLocation.text.toString(),
+                status = "Pending"
+            )
+
+            viewModel.postComplaint(complaint)
+                .onStart {
+                    Log.d("postComplaint", "post complaint has started")
+                }
+                .onEach { result ->
+                    when (result) {
+                        is Result.Success<Complaint> -> {
+                            showToast("Complaint sent successfully")
+                            requireActivity().onBackPressed()
+                        }
+
+                        is Result.Loading -> {}
+                        is Result.Failed -> {}
+                        is Result.Error -> {}
+                    }
+                }
+                .launchIn(lifecycleScope)
+        }
+
+        return binding.root
+    }
+
+    private fun camera() {
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        startActivityForResult(intent, CAMERA_REQUEST_CODE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        try {
-            Log.d(DEBUGGING, "resultcode equals $resultCode and RESULT_OK equals $RESULT_OK")
-            Log.d(DEBUGGING, "requestCode equals $requestCode")
-            if (requestCode == REQUEST_CODE_IMAGE_PICK && resultCode == Activity.RESULT_OK) {
-                data?.let {
-                    if (it.clipData != null) {
-                        val clipData = it.clipData
-                        if (clipData != null) {
-                            for (i in 0 until clipData.itemCount) {
-                                val item = clipData?.getItemAt(i)
-                                val uri = item?.uri
-                                if (uri != null) {
-                                    val bitmap = MediaStore.Images.Media.getBitmap(activity?.contentResolver, uri)
-                                    val stream = ByteArrayOutputStream()
-                                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-                                    val byteArray = stream.toByteArray()
-                                    val uriString = uri.toString()
-                                    val imageUri = Uri.parse(uriString)
-                                    images.add(imageUri)
 
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                CAMERA_REQUEST_CODE -> {
+                    val bitmap = data?.extras?.get("data") as Bitmap
+                    val uri = saveImage(bitmap)
+                    imageUris.add(uri)
+                    imageAdapter.notifyDataSetChanged()
+                }
 
-                                    val storageReference = storage.reference.child("images/${UUID.randomUUID()}")
-                                    val uploadTask = storageReference.putBytes(byteArray)
-
-                                    uploadTask.addOnSuccessListener {
-                                        Log.d(DEBUGGING, "Image uploaded successfully")
-                                        imageAdapter.addImage(imageUri)
-                                    }
-                                    uploadTask.addOnFailureListener { exception ->
-                                        Log.e(DEBUGGING, "Error uploading image: ${exception.message}")
-                                    }
-                                }
-                                Log.d(DEBUGGING, "Selected image URI: $uri")
-                            }
+                GALLERY_REQUEST_CODE -> {
+                    val clipData = data?.clipData
+                    if (clipData != null) {
+                        for (i in 0 until clipData.itemCount) {
+                            val selectedImageUri = clipData.getItemAt(i).uri
+                            imageUris.add(selectedImageUri)
                         }
-                    } else if (it.data != null) {
-                        val uri = it.data
-                        if (uri != null) {
-                            val bitmap = MediaStore.Images.Media.getBitmap(activity?.contentResolver, uri)
-                            val stream = ByteArrayOutputStream()
-                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-                            val byteArray = stream.toByteArray()
-                            val uriString = uri.toString()
-                            val imageUri = Uri.parse(uriString)
-                            images.add(imageUri)
-
-                            val storageReference = storage.reference.child("images/${UUID.randomUUID()}")
-                            val uploadTask = storageReference.putBytes(byteArray)
-
-                            uploadTask.addOnSuccessListener {
-                                Log.d(DEBUGGING, "Image uploaded successfully")
-                                imageAdapter.addImage(imageUri)
-                            }
-                            uploadTask.addOnFailureListener { exception ->
-                                Log.e(DEBUGGING, "Error uploading image: ${exception.message}")
-                            }
+                    } else {
+                        val selectedImageUri = data?.data
+                        selectedImageUri?.let {
+                            imageUris.add(it)
                         }
-                        Log.d(DEBUGGING, "Selected image URI: $uri")
                     }
+                    imageAdapter.notifyDataSetChanged()
                 }
             }
-        } catch (e: Exception) {
-            Log.e(DEBUGGING, "Error in onActivityResult: ${e.message}")
         }
+
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        try {
-            // Inflate the layout for this fragment
-            binding = FragmentPostComplaintBinding.inflate(inflater, container, false)
-            (activity as UserActivity).setButtonInvisible()
+    private fun saveImage(bitmap: Bitmap): Uri {
+        // Save the bitmap to a file and return the file URI
+        // You need to implement this logic according to your requirements
+        // Here's an example implementation using MediaStore:
 
-            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-            createLocationRequest()
+        val resolver = requireContext().contentResolver
+        val contentValues = ContentValues()
+        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, "image_${UUID.randomUUID()}.jpg")
+        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
 
-            binding.btnAddLocation.setOnClickListener {
-                if (ActivityCompat.checkSelfPermission(
-                        requireContext(),
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                    ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                        requireContext(),
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    // TODO: Consider calling ActivityCompat#requestPermissions here to request the missing permissions
-                    return@setOnClickListener
-                }
-                fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
-                    if (location != null) {
-                        val latitude = location.latitude
-                        val longitude = location.longitude
-                        val address = getAddress(latitude, longitude)
-                        Log.d(DEBUGGING, "$address")
-                        binding.tvLocation.text = "$address"
-                    }
-                }
+        val imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+        imageUri?.let { uri ->
+            val outputStream = resolver.openOutputStream(uri)
+            outputStream?.use { stream ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
             }
-
-            return binding.root
-        } catch (e: Exception) {
-            Log.e(DEBUGGING, "pcf: Error in onCreateView: ${e.message}")
-            return null
         }
+
+        return imageUri ?: Uri.EMPTY
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        try {
-            super.onCreate(savedInstanceState)
-
-        } catch (e: Exception) {
-            Log.e(DEBUGGING, "pcf: Error in onCreate: ${e.message}")
-        }
-    }
-
-    private fun openImagePicker() {
-        val intent = Intent(Intent.ACTION_PICK)
+    private fun gallery() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
         intent.type = "image/*"
-        startActivityForResult(intent, REQUEST_CODE_IMAGE_PICKER)
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        startActivityForResult(intent, GALLERY_REQUEST_CODE)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
-        //
-        imageAdapter = ImageAdapter(requireContext())
+    private fun galleryCheckPermission() {
+        Dexter.withContext(requireContext())
+            .withPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+            .withListener(object : PermissionListener {
+                override fun onPermissionGranted(response: PermissionGrantedResponse?) {
+                    gallery()
+                }
 
-        binding.btnAddImage.setOnClickListener {
-            openImagePicker()
-        }
+                override fun onPermissionDenied(response: PermissionDeniedResponse?) {
+                    showToast("Permission denied for gallery")
+                    showRationaleDialogForPermission()
+                }
 
-        binding.rvImages.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        binding.rvImages.adapter = imageAdapter
-        //
+                override fun onPermissionRationaleShouldBeShown(
+                    permission: PermissionRequest?,
+                    token: PermissionToken?
+                ) {
+                    showRationaleDialogForPermission()
+                }
+            }).check()
+    }
 
-        binding.btnAddImage.setOnClickListener {
-            val intent = Intent().apply {
-                type = "image/*"
-                action = Intent.ACTION_GET_CONTENT
-                putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+    private fun showRationaleDialogForPermission() {
+        AlertDialog.Builder(requireContext())
+            .setMessage("It looks like you have denied the required permission. Enable permission through the app settings to access this feature.")
+            .setPositiveButton("Go to Settings") { _, _ ->
+                openAppSettings()
             }
-            startActivityForResult(
-                Intent.createChooser(intent, "Select Images"),
-                REQUEST_CODE_IMAGE_PICK
-            )
-        }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
 
-        binding.btnPostComplaint.setOnClickListener {
-            Log.d(DEBUGGING, "Button click listener registered")
-            val complaint = Complaint(
-                title = binding.etTitle.text.toString(),
-                description = binding.etDescription.text.toString(),
-                images = images.toStringList(),
-                userId = mAuth.currentUser!!.uid,
-                location = binding.tvLocation.text.toString()
+    private fun openAppSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        val uri = Uri.fromParts("package", requireContext().packageName, null)
+        intent.data = uri
+        startActivity(intent)
+    }
+
+    private fun cameraCheckPermission() {
+        Dexter.withContext(requireContext())
+            .withPermissions(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA
             )
-            lifecycleScope.launch {
-                Log.d(DEBUGGING, "krava userId = ${config.userId}")
-                when (val result = viewModel.postComplaint(complaint).first()) {
-                    is Result.Success -> {
-                        Log.d(DEBUGGING, "Complaint added successfully")
-                        showToast("Complaint posted")
-                    }
-                    is Result.Error -> {
-                        Log.d(DEBUGGING, "Error posting complaint: ${result.exception}")
-                        showToast("Error posting complaint")
-                    }
-                    is Result.Failed -> {
-                        Log.d(DEBUGGING, "Error posting complaint: ${result.error} message:${result.message}")
-                        showToast("Failed posting complaint")
-                    }
-                    is Result.Loading -> {
-                        Log.d(DEBUGGING, "Loading posting complaint: ${result.isLoading}")
-//                        showProgress()
+            .withListener(object : MultiplePermissionsListener {
+                override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                    report?.let {
+                        if (report.areAllPermissionsGranted()) {
+                            camera()
+                        }
                     }
                 }
-            }
-            requireActivity().supportFragmentManager.popBackStack()
-        }
-    }
 
-    override fun onResume() {
-        super.onResume()
-        (activity as UserActivity).setButtonInvisible()
-        requireActivity().onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                requireFragmentManager().popBackStack()
-            }
-        })
-    }
-
-    override fun onPause() {
-        super.onPause()
-        (activity as UserActivity).setButtonVisible()
+                override fun onPermissionRationaleShouldBeShown(
+                    permissions: MutableList<PermissionRequest>?,
+                    token: PermissionToken?
+                ) {
+                    showRationaleDialogForPermission()
+                }
+            })
+            .check()
     }
 
 }
-

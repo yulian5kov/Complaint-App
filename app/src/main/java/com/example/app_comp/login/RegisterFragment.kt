@@ -6,10 +6,17 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.app_comp.*
+import com.example.app_comp.data.User
 import com.example.app_comp.databinding.FragmentRegisterBinding
+import com.example.app_comp.utils.Result
+import com.example.app_comp.utils.USER_ROLE
+import com.example.app_comp.utils.config
+import com.example.app_comp.utils.isValidEmail
+import com.example.app_comp.utils.mAuth
+import com.example.app_comp.utils.showToast
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -17,7 +24,7 @@ import kotlinx.coroutines.flow.onEach
 class RegisterFragment : Fragment() {
 
     private lateinit var binding: FragmentRegisterBinding
-    private val viewModel: LoginViewModel by activityViewModels()
+    private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,7 +33,7 @@ class RegisterFragment : Fragment() {
         binding = FragmentRegisterBinding.inflate(layoutInflater)
 
         binding.btLogin.setOnClickListener {
-            if (validateInputData()){
+                if (!validateInputData()) return@setOnClickListener
                 val name = binding.etName.text.toString()
                 val email = binding.etEmail.text.toString()
                 val password = binding.etPassword.text.toString()
@@ -37,42 +44,32 @@ class RegisterFragment : Fragment() {
                 }
 
                 val user = User(name = name, email = email, user_role = USER_ROLE)
-//                showProgress()
 
                 viewModel.addUser(user, password)
                     .onEach { result ->
                         when (result) {
                             is Result.Success -> {
-//                                hideProgress()
                                 showToast("User successfully registered")
-
                                 config.userId = mAuth.currentUser!!.uid
                                 config.userName = user.name
                                 config.userEmail = user.email
                                 config.userRole = USER_ROLE
                                 config.isLoggedIn = true
-
                                 startActivity(Intent(requireActivity(), UserActivity::class.java))
                                 requireActivity().finish()
                             }
                             is Result.Error -> {
-//                                hideProgress()
                                 showToast(result.exception)
                             }
                             is Result.Failed -> {
-//                                hideProgress()
                                 showToast("${result.message} + ${result.error}")
                             }
                             is Result.Loading -> {
-//                                showProgress()
                             }
                         }
                     }
                     .launchIn(viewLifecycleOwner.lifecycleScope)
-
-            }
         }
-
         return binding.root
     }
 
